@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.0/StockManager-1.0.0.jar",
-  "release_notes": "Initial release"
+  "version": "1.0.1",
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.1/StockManager-1.0.0.jar",
+  "release_notes": "Bug fixes: edit dialog now correctly pre-fills color and size, sales dropdown shows full product color and size, bead sizes corrected"
 }
