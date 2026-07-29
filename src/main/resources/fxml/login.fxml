@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.stockmanager.controller.LoginController"
+           styleClass="login-root">
+
+    <VBox alignment="CENTER" spacing="0">
+        <VBox styleClass="login-card" alignment="CENTER" spacing="16">
+
+            <Label text="Stock Manager" styleClass="login-title"/>
+            <Label text="Sign in to your account" styleClass="login-subtitle"/>
+
+            <VBox spacing="6" style="-fx-padding: 8 0 0 0;">
+                <Label text="Username" styleClass="form-label"/>
+                <TextField fx:id="usernameField" styleClass="form-field"
+                           promptText="Enter your username"/>
+            </VBox>
+
+            <VBox spacing="6">
+                <Label text="Password" styleClass="form-label"/>
+                <PasswordField fx:id="passwordField" styleClass="form-field"
+                              promptText="Enter your password"/>
+            </VBox>
+
+            <Label fx:id="errorLabel" styleClass="error-label" text="" wrapText="true"/>
+
+            <Button text="Sign In" styleClass="btn-primary,btn-lg"
+                    onAction="#handleLogin" maxWidth="Infinity"/>
+
+        </VBox>
+    </VBox>
+</StackPane>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stockmanager.controller.ReportsController"
+      styleClass="screen-root" spacing="16">
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label styleClass="screen-title" text="Reports &amp; Analytics"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label styleClass="form-label" text="Year:"/>
+        <ComboBox fx:id="yearCombo" styleClass="form-field" onAction="#handleYearChange"/>
+        <Button text="📥 Export CSV" styleClass="btn-outline" onAction="#handleExportCsv"/>
+    </HBox>
+
+    <TabPane fx:id="tabPane" styleClass="report-tabs" VBox.vgrow="ALWAYS">
+
+        <!-- WEEKLY TAB -->
+        <Tab text="📅 Weekly" closable="false">
+            <VBox spacing="12" styleClass="tab-content">
+                <HBox spacing="24">
+                    <Label fx:id="lblWeekTotal" styleClass="total-label" text="This Week: RWF 0"/>
+                    <Label fx:id="lblWeekUsd" styleClass="total-usd" text="≈ USD 0.00"/>
+                </HBox>
+                <BarChart fx:id="weeklyChart" VBox.vgrow="ALWAYS" styleClass="report-chart">
+                    <xAxis><CategoryAxis label="Day"/></xAxis>
+                    <yAxis><NumberAxis label="Sales (RWF)"/></yAxis>
+                </BarChart>
+            </VBox>
+        </Tab>
+
+        <!-- MONTHLY TAB -->
+        <Tab text="🗓 Monthly" closable="false">
+            <VBox spacing="12" styleClass="tab-content">
+                <HBox spacing="24">
+                    <VBox spacing="4">
+                        <Label fx:id="lblMonthTotal" styleClass="total-label" text="This Month: RWF 0"/>
+                        <Label fx:id="lblMonthUsd" styleClass="total-usd" text="≈ USD 0.00"/>
+                    </VBox>
+                    <VBox spacing="4">
+                        <Label fx:id="lblYearTotal" styleClass="total-label" text="Year Total: RWF 0"/>
+                        <Label fx:id="lblYearUsd" styleClass="total-usd" text="≈ USD 0.00"/>
+                    </VBox>
+                </HBox>
+                <BarChart fx:id="monthlyChart" VBox.vgrow="ALWAYS" styleClass="report-chart">
+                    <xAxis><CategoryAxis label="Month"/></xAxis>
+                    <yAxis><NumberAxis label="Sales (RWF)"/></yAxis>
+                </BarChart>
+            </VBox>
+        </Tab>
+
+        <!-- ANNUAL TAB -->
+        <Tab text="📈 Annual" closable="false">
+            <VBox spacing="12" styleClass="tab-content">
+                <BarChart fx:id="annualChart" VBox.vgrow="ALWAYS" styleClass="report-chart">
+                    <xAxis><CategoryAxis label="Year"/></xAxis>
+                    <yAxis><NumberAxis label="Total Sales (RWF)"/></yAxis>
+                </BarChart>
+            </VBox>
+        </Tab>
+
+        <!-- TOP PRODUCTS TAB -->
+        <Tab text="🏆 Top Products" closable="false">
+            <VBox spacing="12" styleClass="tab-content">
+                <Label styleClass="panel-title" text="Best-Selling Products (This Year by Revenue)"/>
+                <BarChart fx:id="topProductsChart" VBox.vgrow="ALWAYS" styleClass="report-chart">
+                    <xAxis><CategoryAxis label="Product"/></xAxis>
+                    <yAxis><NumberAxis label="Revenue (RWF)"/></yAxis>
+                </BarChart>
+            </VBox>
+        </Tab>
+
+    </TabPane>
+</VBox>

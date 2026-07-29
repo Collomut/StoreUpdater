@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stockmanager.controller.OverviewController"
+      styleClass="screen-root" spacing="20">
+
+    <Label styleClass="screen-title" text="All Shops Overview"/>
+    <Label styleClass="settings-hint" text="Admin view — live comparison of all shops. Data refreshes each time you open this screen."/>
+
+    <!-- Comparison Table -->
+    <TableView fx:id="overviewTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colShop"       text="Shop"            prefWidth="200"/>
+            <TableColumn fx:id="colToday"      text="Today (RWF)"     prefWidth="160"/>
+            <TableColumn fx:id="colMonth"      text="This Month (RWF)" prefWidth="160"/>
+            <TableColumn fx:id="colStock"      text="Stock Value (RWF)" prefWidth="160"/>
+            <TableColumn fx:id="colLowStock"   text="Low Stock Items"  prefWidth="130"/>
+            <TableColumn fx:id="colProducts"   text="Total Products"   prefWidth="130"/>
+        </columns>
+        <placeholder><Label text="Loading shop data..." styleClass="table-placeholder"/></placeholder>
+    </TableView>
+
+    <!-- Totals Row -->
+    <HBox spacing="24" style="-fx-padding: 8 0 0 0;">
+        <Label fx:id="lblAllToday"  styleClass="total-label"/>
+        <Label fx:id="lblAllMonth"  styleClass="total-label"/>
+    </HBox>
+
+    <Button text="Refresh" styleClass="btn-primary" onAction="#handleRefresh"/>
+</VBox>

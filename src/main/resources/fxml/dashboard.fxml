@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stockmanager.controller.DashboardController"
+      styleClass="screen-root" spacing="20">
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label styleClass="screen-title" text="Dashboard"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Refresh" styleClass="btn-outline" onAction="#handleRefresh"/>
+    </HBox>
+
+    <!-- KPI Cards Row -->
+    <HBox spacing="16">
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS" spacing="6">
+            <Label styleClass="kpi-label" text="TODAY'S SALES"/>
+            <Label fx:id="lblTodaySales" styleClass="kpi-value" text="RWF 0"/>
+            <Label fx:id="lblTodaySalesUsd" styleClass="kpi-sub" text=""/>
+        </VBox>
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS" spacing="6">
+            <Label styleClass="kpi-label" text="STOCK VALUE"/>
+            <Label fx:id="lblStockValue" styleClass="kpi-value" text="RWF 0"/>
+            <Label fx:id="lblStockValueUsd" styleClass="kpi-sub" text=""/>
+        </VBox>
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS" spacing="6">
+            <Label styleClass="kpi-label" text="LOW STOCK ITEMS"/>
+            <Label fx:id="lblLowStockCount" styleClass="kpi-value" text="0"/>
+            <Label styleClass="kpi-sub" text="Need restocking"/>
+        </VBox>
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS" spacing="6">
+            <Label styleClass="kpi-label" text="THIS WEEK"/>
+            <Label fx:id="lblWeekSales" styleClass="kpi-value" text="RWF 0"/>
+            <Label styleClass="kpi-sub" text="7-day total"/>
+        </VBox>
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS" spacing="6">
+            <Label styleClass="kpi-label" text="THIS MONTH"/>
+            <Label fx:id="lblMonthSales" styleClass="kpi-value" text="RWF 0"/>
+            <Label styleClass="kpi-sub" text="Month total"/>
+        </VBox>
+    </HBox>
+
+    <!-- Quick Actions + Low Stock List -->
+    <HBox spacing="16" VBox.vgrow="ALWAYS">
+        <!-- Quick Actions -->
+        <VBox styleClass="dashboard-panel" spacing="12" minWidth="200" maxWidth="220">
+            <Label styleClass="panel-title" text="Quick Actions"/>
+            <Button fx:id="btnQuickInventory" text="Add Stock"   styleClass="btn-primary" maxWidth="Infinity" onAction="#handleGoInventory"/>
+            <Button fx:id="btnQuickSale"      text="Record Sale" styleClass="btn-success" maxWidth="Infinity" onAction="#handleGoSales"/>
+        </VBox>
+
+        <!-- Restock Alert List -->
+        <VBox styleClass="dashboard-panel" spacing="8" HBox.hgrow="ALWAYS">
+            <Label styleClass="panel-title" text="Restock Alerts — Items Running Low"/>
+            <ScrollPane fitToWidth="true" styleClass="low-stock-scroll" VBox.vgrow="ALWAYS">
+                <VBox fx:id="lowStockList" spacing="6" styleClass="low-stock-container"/>
+            </ScrollPane>
+        </VBox>
+    </HBox>
+</VBox>

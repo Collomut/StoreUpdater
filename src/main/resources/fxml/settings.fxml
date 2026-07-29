@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.stockmanager.controller.SettingsController"
+            fitToWidth="true" styleClass="screen-root-scroll">
+
+    <VBox styleClass="screen-root" spacing="24">
+
+        <Label styleClass="screen-title" text="Settings"/>
+        <Label fx:id="lblStatus" styleClass="status-label" text=""/>
+
+        <!-- ── Change Password ── -->
+        <VBox styleClass="settings-section" spacing="12">
+            <Label styleClass="section-header" text="Change Your Password"/>
+            <Label styleClass="settings-hint" text="Enter your current password, then set a new one."/>
+
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="Current Password"/>
+                    <PasswordField fx:id="fldCurrentPwd" styleClass="form-field" promptText="Current password"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="New Password"/>
+                    <PasswordField fx:id="fldNewPwd" styleClass="form-field" promptText="New password"/>
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="Confirm New Password"/>
+                    <PasswordField fx:id="fldConfirmPwd" styleClass="form-field" promptText="Confirm password"/>
+                </VBox>
+                <VBox alignment="BOTTOM_LEFT">
+                    <Button text="Update Password" styleClass="btn-primary" onAction="#handleChangePassword"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- ── USD Rate ── -->
+        <VBox styleClass="settings-section" spacing="12">
+            <Label styleClass="section-header" text="Currency Settings"/>
+            <Label styleClass="settings-hint" text="Set the exchange rate used to convert RWF totals to USD."/>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <VBox spacing="4">
+                    <Label styleClass="form-label" text="1 USD = ? RWF"/>
+                    <TextField fx:id="fldUsdRate" styleClass="form-field" prefWidth="150" promptText="e.g. 1380"/>
+                </VBox>
+                <VBox alignment="BOTTOM_LEFT">
+                    <Button text="Save Rate" styleClass="btn-primary" onAction="#handleSaveUsdRate"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- ── Shops ── -->
+        <VBox styleClass="settings-section" spacing="12">
+            <Label styleClass="section-header" text="Manage Shops"/>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <TextField fx:id="fldShopName" styleClass="form-field" prefWidth="200" promptText="Shop name"/>
+                <TextField fx:id="fldShopDesc" styleClass="form-field" prefWidth="280" promptText="Description (optional)" HBox.hgrow="ALWAYS"/>
+                <Button text="Add Shop" styleClass="btn-primary" onAction="#handleAddShop"/>
+            </HBox>
+            <VBox fx:id="shopsContainer" spacing="8"/>
+        </VBox>
+
+        <!-- ── User Management (admin only) ── -->
+        <VBox fx:id="userMgmtSection" styleClass="settings-section" spacing="12">
+            <Label styleClass="section-header" text="User Management"/>
+            <Label styleClass="settings-hint" text="Add or remove workers. Workers can only see their assigned shop."/>
+
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <VBox spacing="4">
+                    <Label styleClass="form-label" text="Username"/>
+                    <TextField fx:id="fldNewUsername" styleClass="form-field" prefWidth="140" promptText="Username"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label styleClass="form-label" text="Password"/>
+                    <PasswordField fx:id="fldNewUserPwd" styleClass="form-field" prefWidth="140" promptText="Password"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label styleClass="form-label" text="Role"/>
+                    <ComboBox fx:id="cmbUserRole" styleClass="combo-box" prefWidth="110"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label styleClass="form-label" text="Assigned Shop"/>
+                    <ComboBox fx:id="cmbUserShop" styleClass="combo-box" prefWidth="160"/>
+                </VBox>
+                <VBox alignment="BOTTOM_LEFT">
+                    <Button text="Add User" styleClass="btn-primary" onAction="#handleAddUser"/>
+                </VBox>
+            </HBox>
+
+            <TableView fx:id="usersTable" styleClass="data-table" prefHeight="200">
+                <columns>
+                    <TableColumn fx:id="colUsername" text="Username"  prefWidth="140"/>
+                    <TableColumn fx:id="colRole"     text="Role"      prefWidth="100"/>
+                    <TableColumn fx:id="colShop"     text="Shop"      prefWidth="160"/>
+                    <TableColumn fx:id="colActions"  text="Actions"   prefWidth="160"/>
+                </columns>
+                <placeholder><Label text="No users found." styleClass="table-placeholder"/></placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- ── Backup ── -->
+        <VBox styleClass="settings-section" spacing="12">
+            <Label styleClass="section-header" text="Database Backup"/>
+            <Label styleClass="settings-hint" text="Export all data to a SQL backup file for safekeeping."/>
+            <Button text="Save Backup Copy" styleClass="btn-secondary" onAction="#handleBackup"/>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

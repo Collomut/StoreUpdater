@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stockmanager.controller.SalesController"
+      styleClass="screen-root" spacing="20">
+
+    <!-- LEFT: Product Picker -->
+    <VBox styleClass="sale-panel" spacing="14" minWidth="320" maxWidth="340">
+        <Label styleClass="screen-title" text="Record Sale"/>
+
+        <Label styleClass="form-label" text="Date"/>
+        <DatePicker fx:id="datePicker" styleClass="form-field" maxWidth="Infinity"/>
+
+        <!-- Bead size filter (shown only for Nyabugogo) -->
+        <HBox fx:id="sizeFilterRow" spacing="8" alignment="CENTER_LEFT"
+              visible="false" managed="false">
+            <Label styleClass="form-label" text="Size" minWidth="60"/>
+            <ComboBox fx:id="sizeFilterCombo" styleClass="form-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        </HBox>
+
+        <!-- Live product search -->
+        <TextField fx:id="productSearchField" styleClass="form-field"
+                   promptText="🔍  Search product..." maxWidth="Infinity"/>
+
+        <Label styleClass="form-label" text="Product"/>
+        <ComboBox fx:id="productCombo" styleClass="form-field" maxWidth="Infinity"/>
+
+
+        <Label styleClass="form-label" text="Quantity"/>
+        <TextField fx:id="qtyField" styleClass="form-field" text="1"/>
+
+        <!-- Bargain price override (Downtown shop only) -->
+        <VBox fx:id="priceOverrideRow" spacing="4" visible="false" managed="false">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Label styleClass="form-label" text="Sale Price (RWF)"/>
+                <Label fx:id="lblGuidePrice" style="-fx-text-fill:#888; -fx-font-size:11px;"
+                       text="(guide price shown)"/>
+            </HBox>
+            <TextField fx:id="salePriceField" styleClass="form-field"
+                       promptText="Enter actual bargained price"/>
+        </VBox>
+
+        <Button text="Add to Basket" styleClass="btn-primary"
+                onAction="#handleAddToBasket" maxWidth="Infinity"/>
+
+
+        <Separator/>
+        <Label styleClass="form-label" text="Notes (optional)"/>
+        <TextField fx:id="notesField" styleClass="form-field" promptText="e.g. Customer name"/>
+    </VBox>
+
+    <!-- RIGHT: Basket -->
+    <VBox HBox.hgrow="ALWAYS" styleClass="sale-panel" spacing="12">
+        <Label styleClass="panel-title" text="Basket"/>
+
+        <TableView fx:id="basketTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colProduct"  text="Product"      prefWidth="200"/>
+                <TableColumn fx:id="colQty"      text="Qty"          prefWidth="60"/>
+                <TableColumn fx:id="colUnitPrice" text="Unit Price"  prefWidth="130"/>
+                <TableColumn fx:id="colSubtotal" text="Subtotal"     prefWidth="130"/>
+            </columns>
+            <placeholder><Label text="No items yet. Select a product and add to basket." styleClass="table-placeholder"/></placeholder>
+        </TableView>
+
+        <!-- Total -->
+        <HBox alignment="CENTER_RIGHT" spacing="20">
+            <Label fx:id="lblTotalUsd" styleClass="total-usd" text="≈ USD 0.00"/>
+            <Label fx:id="lblTotal" styleClass="total-label" text="Total: RWF 0"/>
+        </HBox>
+
+        <!-- Actions -->
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Remove Item"  styleClass="btn-danger"  onAction="#handleRemoveFromBasket"/>
+            <Button text="Clear All"    styleClass="btn-outline" onAction="#handleClearBasket"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Confirm Sale" styleClass="btn-success btn-lg" onAction="#handleConfirmSale"/>
+        </HBox>
+    </VBox>
+</HBox>

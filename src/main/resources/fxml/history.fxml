@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stockmanager.controller.HistoryController"
+      styleClass="screen-root" spacing="16">
+
+    <Label styleClass="screen-title" text="Sales History"/>
+
+    <!-- Filter header — two rows so nothing is cramped -->
+    <VBox spacing="10" styleClass="filter-header">
+
+        <!-- Row 1: date range + Filter button -->
+        <HBox spacing="16" alignment="CENTER_LEFT">
+            <Label styleClass="form-label" text="From:" minWidth="42"/>
+            <DatePicker fx:id="fromDate" styleClass="form-field" prefWidth="155"/>
+            <Label styleClass="form-label" text="To:" minWidth="24"/>
+            <DatePicker fx:id="toDate" styleClass="form-field" prefWidth="155"/>
+            <Button text="Apply Filter" styleClass="btn-primary"
+                    onAction="#handleFilter" prefWidth="110"/>
+        </HBox>
+
+        <!-- Row 2: total on left, export on right -->
+        <HBox spacing="16" alignment="CENTER_LEFT">
+            <Label fx:id="lblGrandTotal" styleClass="total-label"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Export CSV" styleClass="btn-outline"
+                    onAction="#handleExportCsv"/>
+        </HBox>
+
+    </VBox>
+
+
+    <!-- Unified flat table: one row per sale item -->
+    <TableView fx:id="salesTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colDate"     text="Date"         prefWidth="110"/>
+            <TableColumn fx:id="colReceipt"  text="Receipt"      prefWidth="110"/>
+            <TableColumn fx:id="colTotal"    text="Total (RWF)"  prefWidth="130"/>
+            <TableColumn fx:id="colProduct"  text="Product"      prefWidth="220"/>
+            <TableColumn fx:id="colQty"      text="Qty"          prefWidth="70"/>
+            <TableColumn fx:id="colUnitPrice" text="Unit Price"  prefWidth="120"/>
+            <TableColumn fx:id="colSubtotal" text="Subtotal"     prefWidth="120"/>
+        </columns>
+        <placeholder><Label text="No sales found for this period." styleClass="table-placeholder"/></placeholder>
+    </TableView>
+</VBox>

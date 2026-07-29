@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stockmanager.controller.InventoryController"
+      styleClass="screen-root" spacing="16">
+
+    <Label styleClass="screen-title" text="Inventory Management"/>
+
+    <!-- Search Bar -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" styleClass="search-field"
+                   promptText="Search by name or category..."
+                   prefWidth="340" HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblLowStock" styleClass="stat-badge-warn" text="Low stock: 0"/>
+        <Label fx:id="lblTotal" styleClass="stat-badge" text="Total: 0"/>
+    </HBox>
+
+    <!-- Action Buttons Row -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <Button fx:id="btnAdd" text="Add Product" styleClass="btn-primary"
+                onAction="#handleAdd" minWidth="110">
+            <tooltip><Tooltip text="Add a new product to this shop's inventory"/></tooltip>
+        </Button>
+        <Button fx:id="btnEdit" text="Edit Selected" styleClass="btn-secondary"
+                onAction="#handleEdit" minWidth="110">
+            <tooltip><Tooltip text="Edit the product selected in the table"/></tooltip>
+        </Button>
+        <Button fx:id="btnDelete" text="Delete Selected" styleClass="btn-danger"
+                onAction="#handleDelete" minWidth="120">
+            <tooltip><Tooltip text="Permanently delete the selected product"/></tooltip>
+        </Button>
+        <Button text="Export to CSV" styleClass="btn-outline"
+                onAction="#handleExportCsv" minWidth="120">
+            <tooltip><Tooltip text="Save the current product list as a CSV spreadsheet file"/></tooltip>
+        </Button>
+    </HBox>
+
+    <!-- Table -->
+    <TableView fx:id="productTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colName"     text="Product Name"    prefWidth="240"/>
+            <TableColumn fx:id="colCategory" text="Category"        prefWidth="160"/>
+            <TableColumn fx:id="colUnit"     text="Unit"            prefWidth="80"/>
+            <TableColumn fx:id="colQty"      text="In Stock"        prefWidth="100"/>
+            <TableColumn fx:id="colPrice"    text="Selling Price"   prefWidth="140"/>
+            <TableColumn fx:id="colStatus"   text="Status"          prefWidth="120"/>
+        </columns>
+        <placeholder><Label text="No products yet. Click Add Product to get started." styleClass="table-placeholder"/></placeholder>
+    </TableView>
+</VBox>

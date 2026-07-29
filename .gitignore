@@ -1,0 +1,29 @@
+# ── Maven build output ────────────────────────────────────────────────────────
+target/
+
+# ── jpackage / installer outputs ─────────────────────────────────────────────
+dist/
+dist-installer/
+package-input/
+AppDir/
+*.AppImage
+appimagetool
+
+# ── SENSITIVE: database credentials — NEVER commit this file ─────────────────
+src/main/resources/config.properties
+
+# ── IDE project files ─────────────────────────────────────────────────────────
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+*.class
+
+# ── OS metadata ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+GITHUB_README.md

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.stockmanager.controller.MainController"
+            styleClass="main-root">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar" spacing="4" minWidth="210" maxWidth="210">
+            <Label styleClass="sidebar-brand" text="StockManager"/>
+
+            <!-- Shop Selector (admin only — hidden for workers by controller) -->
+            <HBox fx:id="shopSelectorBox" styleClass="shop-selector-box" spacing="4">
+                <VBox spacing="4">
+                    <Label styleClass="sidebar-section-label" text="ACTIVE SHOP"/>
+                    <ComboBox fx:id="shopComboBox" styleClass="shop-combo" maxWidth="180"/>
+                    <Label fx:id="shopNameLabel" styleClass="shop-name-label" text=""/>
+                </VBox>
+            </HBox>
+
+            <Separator styleClass="sidebar-sep"/>
+            <Label styleClass="sidebar-section-label" text="NAVIGATION"/>
+
+            <ToggleButton fx:id="btnDashboard" styleClass="nav-btn" text="Dashboard"    maxWidth="Infinity"/>
+            <ToggleButton fx:id="btnInventory" styleClass="nav-btn" text="Inventory"    maxWidth="Infinity"/>
+            <ToggleButton fx:id="btnSales"     styleClass="nav-btn" text="Record Sale"  maxWidth="Infinity"/>
+            <ToggleButton fx:id="btnHistory"   styleClass="nav-btn" text="Sales History" maxWidth="Infinity"/>
+            <ToggleButton fx:id="btnReports"   styleClass="nav-btn" text="Reports"      maxWidth="Infinity"/>
+            <ToggleButton fx:id="btnOverview"  styleClass="nav-btn" text="All Shops"    maxWidth="Infinity"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Separator styleClass="sidebar-sep"/>
+            <!-- Settings — hidden for workers by controller -->
+            <ToggleButton fx:id="btnSettings" styleClass="nav-btn" text="Settings"    maxWidth="Infinity"/>
+            <!-- Current user label at bottom -->
+            <Label fx:id="lblCurrentUser" styleClass="settings-hint"
+                   text="" wrapText="true" style="-fx-padding: 4 12 8 12;"/>
+        </VBox>
+    </left>
+
+    <!-- CONTENT -->
+    <center>
+        <StackPane fx:id="contentArea" styleClass="content-area"/>
+    </center>
+</BorderPane>
