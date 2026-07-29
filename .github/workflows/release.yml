@@ -42,16 +42,13 @@ jobs:
       - name: Write config.properties (from secrets)
         shell: pwsh
         run: |
-          @"
-          db.url=${{ secrets.DB_URL }}
-          db.user=${{ secrets.DB_USER }}
-          db.password=${{ secrets.DB_PASSWORD }}
-          "@ | Set-Content src\main\resources\config.properties -Encoding UTF8
+          $content = "db.url=${{ secrets.DB_URL }}`ndb.user=${{ secrets.DB_USER }}`ndb.password=${{ secrets.DB_PASSWORD }}`n"
+          [System.IO.File]::WriteAllText("src/main/resources/config.properties", $content)
 
       - name: Set version
         shell: pwsh
         run: |
-          "app.version=${{ inputs.version }}" | Set-Content src\main\resources\version.properties -Encoding UTF8
+          [System.IO.File]::WriteAllText("src/main/resources/version.properties", "app.version=${{ inputs.version }}`n")
 
       - name: Build fat JAR
         run: mvn package -q
