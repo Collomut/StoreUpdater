@@ -235,9 +235,29 @@ public class AutoUpdater {
 
             Files.writeString(batFile, bat);
 
-            new ProcessBuilder("cmd.exe", "/c", "start", "/min", "\"\"",
-                               batFile.toAbsolutePath().toString())
-                .start();
+            // Check if we have write permission to the target JAR.
+            // If not, we must elevate the update process to Administrator.
+            boolean needsElevation = false;
+            try {
+                // Attempt to open the target JAR for appending to check write permission
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(jarPath.toFile(), true)) {
+                    // write access allowed
+                }
+            } catch (IOException e) {
+                needsElevation = true;
+            }
+
+            if (needsElevation) {
+                // Launch the batch script with elevated privileges (UAC prompt)
+                new ProcessBuilder("powershell.exe", "-Command",
+                    "Start-Process cmd.exe -ArgumentList '/c', '\"" + batFile.toAbsolutePath() + "\"' -Verb RunAs -WindowStyle Hidden")
+                    .start();
+            } else {
+                // Launch normally (silently)
+                new ProcessBuilder("cmd.exe", "/c", "start", "/min", "\"\"",
+                                   batFile.toAbsolutePath().toString())
+                    .start();
+            }
 
             Platform.exit();
             System.exit(0);
