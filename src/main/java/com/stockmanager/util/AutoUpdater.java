@@ -228,7 +228,7 @@ public class AutoUpdater {
                 "    echo Update failed: could not replace application file." + nl +
                 "    pause" + nl +
                 ") else (" + nl +
-                "    start \"\" \"" + exePath.toAbsolutePath() + "\"" + nl +
+                "    explorer.exe \"" + exePath.toAbsolutePath() + "\"" + nl +
                 ")" + nl +
                 "del \"" + downloadedJar.toAbsolutePath() + "\" >nul 2>&1" + nl +
                 "(goto) 2>nul & del \"%~f0\"" + nl;
