@@ -346,20 +346,39 @@ public class DatabaseManager {
         try (Connection conn = getConn();
              PreparedStatement ps = conn.prepareStatement(
                 "SELECT s.sale_date, s.receipt_number, s.total_amount, " +
-                "       p.name AS product_name, si.quantity_sold, si.unit_price " +
+                "       p.name AS product_name, p.category AS product_category, p.unit AS product_unit, " +
+                "       si.quantity_sold, si.unit_price, sh.name AS shop_name " +
                 "FROM sales s " +
                 "JOIN sale_items si ON si.sale_id = s.id " +
                 "JOIN products p   ON p.id = si.product_id " +
+                "JOIN shops sh     ON sh.id = s.shop_id " +
                 "WHERE s.shop_id = ? AND s.sale_date BETWEEN ? AND ? " +
                 "ORDER BY s.sale_date DESC, s.id, p.name")) {
             ps.setInt(1, shopId); ps.setDate(2, Date.valueOf(from)); ps.setDate(3, Date.valueOf(to));
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
+                String pName = rs.getString("product_name");
+                String pCat = rs.getString("product_category");
+                String pUnit = rs.getString("product_unit");
+                String shopName = rs.getString("shop_name");
+                boolean isNyabugogo = shopName != null && shopName.toLowerCase().contains("nyabugogo");
+
+                String fullProductName;
+                if (isNyabugogo) {
+                    String color = (pCat != null && !pCat.isBlank()) ? pCat : "";
+                    String size  = (pUnit != null && !pUnit.isBlank()) ? pUnit : "";
+                    fullProductName = pName
+                        + (color.isEmpty() ? "" : " — " + color)
+                        + (size.isEmpty()  ? "" : " (" + size + ")");
+                } else {
+                    fullProductName = pName;
+                }
+
                 list.add(new FlatSaleRow(
                     rs.getDate("sale_date").toLocalDate(),
                     rs.getString("receipt_number"),
                     rs.getDouble("total_amount"),
-                    rs.getString("product_name"),
+                    fullProductName,
                     rs.getInt("quantity_sold"),
                     rs.getDouble("unit_price")
                 ));
