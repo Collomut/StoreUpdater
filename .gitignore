@@ -1,6 +1,14 @@
 # ── Maven build output ────────────────────────────────────────────────────────
 target/
 
+# ── SENSITIVE: database credentials — NEVER commit these ─────────────────────
+config.properties
+src/main/resources/config.properties
+
+# ── Eclipse workspace (IDE-generated, not source code) ────────────────────────
+src/.metadata/
+.metadata/
+
 # ── jpackage / installer outputs ─────────────────────────────────────────────
 dist/
 dist-installer/
