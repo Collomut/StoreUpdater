@@ -80,6 +80,7 @@ copy /y "target\StockManager-1.0.0.jar" "package-input\" >nul
     --main-jar "StockManager-1.0.0.jar" ^
     --name "StockManager" ^
     --app-version "%APP_VERSION%" ^
+    --icon "src\main\resources\images\icon.ico" ^
     --java-options "-Djava.net.preferIPv4Stack=true" ^
     --dest "dist"
 

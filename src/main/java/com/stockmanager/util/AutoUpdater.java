@@ -277,11 +277,17 @@ public class AutoUpdater {
             String sh =
                 "#!/bin/bash\n" +
                 "sleep 2\n" +
+                "rm -f \"" + currentAppImage.toAbsolutePath() + "\"\n" +
                 "cp -f \"" + downloadedAppImage.toAbsolutePath() + "\" \"" +
                     currentAppImage.toAbsolutePath() + "\"\n" +
                 "chmod +x \"" + currentAppImage.toAbsolutePath() + "\"\n" +
                 "if [ $? -eq 0 ]; then\n" +
-                "    \"" + currentAppImage.toAbsolutePath() + "\" &\n" +
+                "    # Check if FUSE is missing on the system. If so, relaunch with extraction flag\n" +
+                "    if [ ! -c /dev/fuse ] || ! (ldconfig -p 2>/dev/null | grep -q libfuse.so.2 || [ -f /lib/x86_64-linux-gnu/libfuse.so.2 ] || [ -f /usr/lib/libfuse.so.2 ] || [ -f /lib64/libfuse.so.2 ]); then\n" +
+                "        \"" + currentAppImage.toAbsolutePath() + "\" --appimage-extract-and-run &\n" +
+                "    else\n" +
+                "        \"" + currentAppImage.toAbsolutePath() + "\" &\n" +
+                "    fi\n" +
                 "fi\n" +
                 "rm -f \"" + downloadedAppImage.toAbsolutePath() + "\"\n" +
                 "rm -f \"$0\"\n";
@@ -313,6 +319,7 @@ public class AutoUpdater {
             String sh =
                 "#!/bin/bash\n" +
                 "sleep 2\n" +
+                "rm -f \"" + jarPath.toAbsolutePath() + "\"\n" +
                 "cp -f \"" + downloadedJar.toAbsolutePath() + "\" \"" +
                     jarPath.toAbsolutePath() + "\"\n" +
                 "if [ $? -eq 0 ]; then\n" +

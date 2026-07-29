@@ -21,6 +21,9 @@ public class Main extends Application {
         scene.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
 
         primaryStage.setTitle("Stock Manager — Login");
+        try {
+            primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/icon.png")));
+        } catch (Exception ignored) {}
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.centerOnScreen();

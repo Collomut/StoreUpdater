@@ -64,6 +64,7 @@ jobs:
             --main-jar StockManager-1.0.0.jar `
             --name StockManager `
             --app-version ${{ inputs.version }} `
+            --icon src/main/resources/images/icon.ico `
             --java-options "-Djava.net.preferIPv4Stack=true" `
             --dest dist
           Remove-Item -Recurse -Force package-input
@@ -139,6 +140,7 @@ jobs:
             --main-jar StockManager-1.0.0.jar \
             --name StockManager \
             --app-version ${{ inputs.version }} \
+            --icon src/main/resources/images/icon.png \
             --java-options "-Djava.net.preferIPv4Stack=true" \
             --dest dist
           rm -rf package-input
@@ -176,12 +178,8 @@ jobs:
           Comment=Retail Stock Management System
           DESKTOP
 
-          # Generate a simple blue icon (256x256 PNG)
-          convert -size 256x256 xc:'#1565C0' \
-            -fill white -font Liberation-Sans-Bold -pointsize 72 \
-            -gravity center -annotate 0 'SM' \
-            AppDir/StockManager.png 2>/dev/null || \
-          convert -size 256x256 xc:'#1565C0' AppDir/StockManager.png
+          # Use the beautiful custom logo icon
+          cp src/main/resources/images/icon.png AppDir/StockManager.png
 
       - name: Build AppImage
         env:
