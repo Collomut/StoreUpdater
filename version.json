@@ -1,5 +1,6 @@
 {
-  "version": "1.0.2",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.2/StockManager-1.0.0.jar",
-  "release_notes": "Bug fix: selecting a size filter or typing in the search box no longer resets the selected product in Record Sale"
+  "version": "1.0.3",
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.3/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.3/StockManager-1.0.3-x86_64.AppImage",
+  "release_notes": "Test automated release with Linux AppImage and Windows installer support"
 }
