@@ -1,6 +1,6 @@
 {
-  "version": "1.0.6",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.6/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.6/StockManager-1.0.6-x86_64.AppImage",
-  "release_notes": "Fix database connection: resolved hidden BOM characters in SUPABASE connection URL"
+  "version": "1.0.7",
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.7/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.0.7/StockManager-1.0.7-x86_64.AppImage",
+  "release_notes": "Show full product details (color and size) in sales history"
 }
