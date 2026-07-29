@@ -115,8 +115,8 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y --no-install-recommends \
             libfuse2 fuse imagemagick \
-            libgtk-3-0 libgl1-mesa-glx libglu1-mesa \
-            libxtst6 libxxf86vm1 libasound2
+            libgtk-3-0 libgl1 libglu1-mesa \
+            libxtst6 libxxf86vm1 libasound2t64
 
       - name: Write config.properties (from secrets)
         run: |
