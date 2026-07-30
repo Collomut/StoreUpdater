@@ -1,6 +1,8 @@
 {
-  "version": "1.1.0",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.1.0/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.1.0/StockManager-1.1.0-x86_64.AppImage",
-  "release_notes": "Fix app icon: generated multi-size Windows ICO file containing 16x16, 32x32, 48x48, 256x256 resolutions"
+  "version": "1.2.0",
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.2.0/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.2.0/StockManager-1.2.0-x86_64.AppImage",
+  "release_notes": "Security updates, login rate limiting, log files, and repository pattern refactoring",
+  "signature": "MW5pMeuWZTTpo2MsSgrgzhmiR1bVdiySlHbY0bDM8zk4gVvf3l8c0Wvm+Tv3DKcRAyOEJEgTLzm4n8f521LURDsXwrD0Q+1UdI4mA+QSCa+REaAG6/Pk5RFYH+6QJdv7f5Dj3XTFaAJGUhIMHh4/ZJn8fRSoi0DCIOuXzhy00cmQKWfwdYnyacX2+gFAxUVZgIvlaME0l567Hn5E1MXeKm62QeH8yyPkxClPme0LzieQJIw1DvnY0L5sqhcGizjOVSYo4oq/RniPbXEPeCtLyZeuarsY2CC7zB/mOc6c6xbLHpKvS0FXn7xIkNJjVyxNaSsJp7gebKU7CSxVbXS0jw==",
+  "signature_linux": "uoctkmc6T2dRQM3coTt2yZXahzRriq5WTkuRtP36wXw5def5P9VJB/iQgp2mo5oYShPjQZFZj+f0c247xog0J3HDN2gjI8qY22r9TUeB03nXzW2qE5axN4pPn/jbVsaLkXiGeDaATCEN8ZBizoWmlAdSumdrL64LHtgUbZ6FRQPT5mlwofedJNZfVm1Db0Xff+mOXF3hGkS4bE67vaPVER9LNaVYpXKdLCFjww1tJj+iQtfnJAESddhOUzF3P9yoibKfR5hb0CucAfUe0ol3sN87QXCT33wU/FoXU8e3dxXtxWQrw9ckNWyAYmXpuy4yCogHibVrwxq2gp17ZX7gCw=="
 }
