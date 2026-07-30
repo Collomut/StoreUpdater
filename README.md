@@ -68,23 +68,22 @@ build_release.bat
 
 ---
 
-## 🔄 Auto-Update System
+## 🔄 Auto-Update & Signing System
 
 The app checks this GitHub repository for updates **every time it launches**.
 
 **How it works:**
-1. App starts → silently fetches `version.json` from this repo
-2. If a newer version is available → shows an update prompt
-3. Staff click **"Update Now"** → downloads new version in background with progress bar
-4. App restarts automatically with the new version
+1. App starts → silently fetches `version.json` from this repo.
+2. If a newer version is available → shows an update prompt.
+3. Staff click **"Update Now"** → downloads new version in background with progress bar.
+4. **Cryptographic Signature Verification**: The downloaded binary's SHA-256 hash is verified against the signature in `version.json` using an embedded RSA public key. If verification fails, the file is deleted and the update is aborted.
+5. App restarts automatically with the new version.
 
 **Update flow for the developer (releasing a new version):**
-1. Make code changes
-2. Bump `app.version` in `version.properties` (e.g. `1.0.1` → `1.0.2`)
-3. Run `build_release.bat`
-4. Create a new GitHub Release tagged `v1.0.2` and upload the new JAR
-5. Update `version.json` in this repo with the new version and download URL
-6. All shop PCs update automatically on next launch — no manual visits needed
+1. Make code changes and push to `main` branch.
+2. Trigger the manual **Build & Release** workflow in GitHub Actions.
+3. The workflow automatically builds the EXE installer and Linux AppImage, signs them using `AUTO_UPDATE_PRIVATE_KEY` repository secret, updates `version.json` with the new version and Base64 signatures, and publishes a new GitHub Release.
+4. All shop PCs update automatically on next launch.
 
 ---
 
@@ -129,6 +128,8 @@ StoreUpdater/
 
 | Version | Date | Summary |
 |---|---|---|
+| `1.2.0` | 2026-07-30 | Security & Architectural: Cryptographic update signing, login rate-limiting lockout, forced password change dialog, logback file logging, JUnit 5 test suite, database repository pattern refactoring. Shaded JAR excludes config properties. |
+| `1.1.0` | 2026-07-29 | Icon & Linux Relaunch: Generated Microsoft multi-resolution ICO file (16x16, 32x32, 48x48, 256x256 resolutions) to fix blank taskbar shortcut icons. Fixed Linux "Text file busy" restart lockouts using file unlinking, and supported relaunching on FUSE-less Linux VMs. |
 | `1.0.1` | 2026-07-29 | Bug fixes: edit dialog pre-fill, sales colour display, bead sizes. Auto-updater introduced. |
 | `1.0.0` | 2026-07-27 | Initial release |
 
@@ -142,6 +143,8 @@ StoreUpdater/
 | UI Framework | JavaFX 21 |
 | Database | PostgreSQL (Supabase) |
 | Connection Pool | HikariCP |
+| Logging | SLF4J + Logback Classic |
+| Testing | JUnit 5 (Jupiter) |
 | Build Tool | Apache Maven |
 | Packaging | jpackage (JDK built-in) |
 | Update Hosting | GitHub Releases |
