@@ -27,7 +27,7 @@ public class SalesController {
     @FXML private TableView<SaleItem> basketTable;
     @FXML private TableColumn<SaleItem, String>  colProduct;
     @FXML private TableColumn<SaleItem, Integer> colQty;
-    @FXML private TableColumn<SaleItem, Double>  colUnitPrice, colSubtotal;
+    @FXML private TableColumn<SaleItem, java.math.BigDecimal>  colUnitPrice, colSubtotal;
     @FXML private Label lblTotal, lblTotalUsd;
     @FXML private TextField notesField;
     @FXML private DatePicker datePicker;
@@ -50,13 +50,13 @@ public class SalesController {
             new javafx.beans.property.SimpleObjectProperty<>(cd.getValue().getSubtotal()));
 
         colUnitPrice.setCellFactory(c -> new TableCell<>() {
-            protected void updateItem(Double v, boolean e) {
-                super.updateItem(v, e); setText(e || v == null ? null : String.format("RWF %,.0f", v));
+            protected void updateItem(java.math.BigDecimal v, boolean e) {
+                super.updateItem(v, e); setText(e || v == null ? null : String.format("RWF %,.0f", v.doubleValue()));
             }
         });
         colSubtotal.setCellFactory(c -> new TableCell<>() {
-            protected void updateItem(Double v, boolean e) {
-                super.updateItem(v, e); setText(e || v == null ? null : String.format("RWF %,.0f", v));
+            protected void updateItem(java.math.BigDecimal v, boolean e) {
+                super.updateItem(v, e); setText(e || v == null ? null : String.format("RWF %,.0f", v.doubleValue()));
             }
         });
 
@@ -88,9 +88,9 @@ public class SalesController {
         // When product is selected, auto-fill the bargain price field (Downtown only)
         productCombo.valueProperty().addListener((obs, old, selected) -> {
             if (isDowntown && selected != null) {
-                salePriceField.setText(String.valueOf((int) selected.getSellingPrice()));
+                salePriceField.setText(String.valueOf(selected.getSellingPrice().intValue()));
                 lblGuidePrice.setText(String.format("(guide: RWF %,.0f)",
-                    selected.getSellingPrice()));
+                    selected.getSellingPrice().doubleValue()));
             } else if (isDowntown) {
                 salePriceField.clear();
                 lblGuidePrice.setText("(guide price shown)");
@@ -246,11 +246,12 @@ public class SalesController {
         }
 
         // Determine the price: Downtown uses the editable field, others use product price
-        double unitPrice;
+        java.math.BigDecimal unitPrice;
         if (isDowntown) {
             try {
-                unitPrice = Double.parseDouble(salePriceField.getText().trim());
-                if (unitPrice <= 0) throw new NumberFormatException();
+                double val = Double.parseDouble(salePriceField.getText().trim());
+                if (val <= 0) throw new NumberFormatException();
+                unitPrice = java.math.BigDecimal.valueOf(val);
             } catch (NumberFormatException ex) {
                 showAlert("Please enter a valid sale price."); return;
             }
@@ -287,11 +288,11 @@ public class SalesController {
             return p.getName()
                 + (color.isEmpty() ? "" : " — " + color)
                 + (size.isEmpty()  ? "" : " (" + size + ")")
-                + "  |  RWF " + String.format("%,.0f", p.getSellingPrice())
+                + "  |  RWF " + String.format("%,.0f", p.getSellingPrice().doubleValue())
                 + "  (stock: " + p.getQuantity() + ")";
         }
         return p.getName()
-            + "  —  RWF " + String.format("%,.0f", p.getSellingPrice())
+            + "  —  RWF " + String.format("%,.0f", p.getSellingPrice().doubleValue())
             + "  (stock: " + p.getQuantity() + ")";
     }
 
@@ -322,7 +323,9 @@ public class SalesController {
         sale.setSaleDate(datePicker.getValue() != null ? datePicker.getValue() : LocalDate.now());
         sale.setNotes(notesField.getText().trim());
         basketItems.forEach(sale::addItem);
-        sale.setTotalAmount(basketItems.stream().mapToDouble(SaleItem::getSubtotal).sum());
+        sale.setTotalAmount(basketItems.stream()
+            .map(SaleItem::getSubtotal)
+            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
 
         int saleId = DatabaseManager.getInstance().saveSale(sale);
         if (saleId > 0) {
@@ -343,7 +346,7 @@ public class SalesController {
     @FXML private void handleClearBasket() { basketItems.clear(); updateTotal(); }
 
     private void updateTotal() {
-        double total = basketItems.stream().mapToDouble(SaleItem::getSubtotal).sum();
+        double total = basketItems.stream().mapToDouble(item -> item.getSubtotal().doubleValue()).sum();
         double usdRate = getUsdRate();
         lblTotal.setText(String.format("Total: RWF %,.0f", total));
         lblTotalUsd.setText(String.format("  USD %.2f", total / usdRate));

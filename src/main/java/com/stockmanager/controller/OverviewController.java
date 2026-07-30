@@ -42,7 +42,7 @@ public class OverviewController {
                 List<DatabaseManager.OverviewRow> raw = DatabaseManager.getInstance().getOverviewStats();
                 List<OverviewController.ShopRow> rows = new java.util.ArrayList<>();
                 for (DatabaseManager.OverviewRow r : raw) {
-                    rows.add(new ShopRow(r.name, r.today, r.month, r.stockValue, r.lowStock, r.products));
+                    rows.add(new ShopRow(r.name, r.today.doubleValue(), r.month.doubleValue(), r.stockValue.doubleValue(), r.lowStock, r.products));
                 }
                 return rows;
             }

@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -147,7 +148,7 @@ public class ProductDialog extends Dialog<Product> {
                 Product p = existingProduct != null ? existingProduct : new Product();
                 if (existingProduct == null) {
                     p.setShopId(shopId);
-                    p.setCostPrice(0);
+                    p.setCostPrice(BigDecimal.ZERO);
                     p.setReorderLevel(5);
                 }
 
@@ -174,7 +175,7 @@ public class ProductDialog extends Dialog<Product> {
                     p.setCategory(color);
                     p.setUnit(size);
                     p.setQuantity(Integer.parseInt(nyQtyField.getText().trim()));
-                    p.setSellingPrice(Double.parseDouble(nyPriceField.getText().trim()));
+                    p.setSellingPrice(new java.math.BigDecimal(nyPriceField.getText().trim()));
 
                 } else {
                     // ── Simple form ────────────────────────────────────────────
@@ -185,7 +186,7 @@ public class ProductDialog extends Dialog<Product> {
                     String u = sfUnit.getText().trim();
                     p.setUnit(u.isEmpty() ? "pcs" : u);
                     p.setQuantity(Integer.parseInt(sfQty.getText().trim()));
-                    p.setSellingPrice(Double.parseDouble(sfPrice.getText().trim()));
+                    p.setSellingPrice(new java.math.BigDecimal(sfPrice.getText().trim()));
                 }
 
                 // Auto-unretire: if qty restored, reset reorder_level sentinel
@@ -222,7 +223,7 @@ public class ProductDialog extends Dialog<Product> {
             sfCategory.setText(nvl(existing.getCategory()));
             sfUnit.setText(nvl(existing.getUnit()));
             sfQty.setText(String.valueOf(existing.getQuantity()));
-            sfPrice.setText(String.valueOf((int) existing.getSellingPrice()));
+            sfPrice.setText(String.valueOf(existing.getSellingPrice().intValue()));
 
             if (existing.isRetired()) root.getChildren().add(0, retiredBanner());
         }
@@ -397,7 +398,7 @@ public class ProductDialog extends Dialog<Product> {
         }
 
         nyQtyField.setText(String.valueOf(existing.getQuantity()));
-        nyPriceField.setText(String.valueOf((int) existing.getSellingPrice()));
+        nyPriceField.setText(String.valueOf(existing.getSellingPrice().intValue()));
     }
 
     // ─────────────────────────────────────────────────────────────────────────

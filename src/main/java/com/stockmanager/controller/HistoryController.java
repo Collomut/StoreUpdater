@@ -62,7 +62,7 @@ public class HistoryController {
             // Grand total = sum of distinct sale totals (not sum of subtotals to avoid duplicates)
             double total = rows.stream()
                 .collect(java.util.stream.Collectors.toMap(r -> r.receipt, r -> r.saleTotal, (a, b) -> a))
-                .values().stream().mapToDouble(Double::doubleValue).sum();
+                .values().stream().mapToDouble(java.math.BigDecimal::doubleValue).sum();
             double usdRate = getUsdRate();
             lblGrandTotal.setText(String.format("Period Total: RWF %,.0f  (USD %.2f)", total, total / usdRate));
         });

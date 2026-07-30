@@ -1,6 +1,7 @@
 package com.stockmanager.model;
 
 import javafx.beans.property.*;
+import java.math.BigDecimal;
 
 public class Product {
     private final IntegerProperty id = new SimpleIntegerProperty();
@@ -11,14 +12,14 @@ public class Product {
     private final StringProperty unit = new SimpleStringProperty();
     private final IntegerProperty quantity = new SimpleIntegerProperty();
     private final IntegerProperty reorderLevel = new SimpleIntegerProperty();
-    private final DoubleProperty costPrice = new SimpleDoubleProperty();
-    private final DoubleProperty sellingPrice = new SimpleDoubleProperty();
+    private final ObjectProperty<BigDecimal> costPrice = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    private final ObjectProperty<BigDecimal> sellingPrice = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
     public Product() {}
 
     public Product(int id, int shopId, String name, String category, String sku,
                    String unit, int quantity, int reorderLevel,
-                   double costPrice, double sellingPrice) {
+                   BigDecimal costPrice, BigDecimal sellingPrice) {
         setId(id); setShopId(shopId); setName(name); setCategory(category);
         setSku(sku); setUnit(unit); setQuantity(quantity);
         setReorderLevel(reorderLevel); setCostPrice(costPrice); setSellingPrice(sellingPrice);
@@ -65,21 +66,20 @@ public class Product {
     public IntegerProperty reorderLevelProperty() { return reorderLevel; }
 
     // Cost Price
-    public double getCostPrice() { return costPrice.get(); }
-    public void setCostPrice(double v) { costPrice.set(v); }
-    public DoubleProperty costPriceProperty() { return costPrice; }
+    public BigDecimal getCostPrice() { return costPrice.get(); }
+    public void setCostPrice(BigDecimal v) { costPrice.set(v); }
+    public ObjectProperty<BigDecimal> costPriceProperty() { return costPrice; }
 
     // Selling Price
-    public double getSellingPrice() { return sellingPrice.get(); }
-    public void setSellingPrice(double v) { sellingPrice.set(v); }
-    public DoubleProperty sellingPriceProperty() { return sellingPrice; }
+    public BigDecimal getSellingPrice() { return sellingPrice.get(); }
+    public void setSellingPrice(BigDecimal v) { sellingPrice.set(v); }
+    public ObjectProperty<BigDecimal> sellingPriceProperty() { return sellingPrice; }
 
     /** A product is retired when reorderLevel is set to -1 (no schema change needed). */
     public boolean isRetired()  { return getReorderLevel() < 0; }
 
     /** Low stock only applies to active (non-retired) products. */
     public boolean isLowStock() { return !isRetired() && getQuantity() < 5; }
-
 
     @Override
     public String toString() { return getName(); }

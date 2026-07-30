@@ -68,6 +68,25 @@
             <artifactId>HikariCP</artifactId>
             <version>5.1.0</version>
         </dependency>
+
+        <!-- Logback classic -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.14</version>
+        </dependency>
+
+        <!-- JUnit Jupiter (JUnit 5) for testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.10.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -82,6 +101,27 @@
                 </configuration>
             </plugin>
 
+            <!-- Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>21</release>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire Plugin to run tests from target/classes -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <testClassesDirectory>target/classes</testClassesDirectory>
+                </configuration>
+            </plugin>
+
             <!-- Fat JAR with all dependencies bundled -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -92,8 +132,16 @@
                         <phase>package</phase>
                         <goals><goal>shade</goal></goals>
                         <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <filters>
+                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                             <artifactSet>
+                                 <excludes>
+                                     <exclude>org.junit.jupiter:*</exclude>
+                                     <exclude>org.junit.platform:*</exclude>
+                                     <exclude>org.apiguardian:*</exclude>
+                                     <exclude>org.opentest4j:*</exclude>
+                                 </excludes>
+                             </artifactSet>
+                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
@@ -101,6 +149,8 @@
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
                                         <exclude>module-info.class</exclude>
+                                        <exclude>config.properties</exclude>
+                                        <exclude>com/stockmanager/db/DatabaseManagerTest.class</exclude>
                                     </excludes>
                                 </filter>
                             </filters>

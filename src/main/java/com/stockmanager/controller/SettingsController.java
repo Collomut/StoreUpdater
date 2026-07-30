@@ -94,8 +94,8 @@ public class SettingsController {
                     dlg.setContentText("New password:");
                     dlg.showAndWait().ifPresent(pwd -> {
                         if (!pwd.isBlank()) {
-                            db.changePassword(u.getId(), pwd);
-                            showStatus("Password reset for " + u.getUsername());
+                            db.resetPassword(u.getId(), pwd);
+                            showStatus("Password reset for " + u.getUsername() + " (forced change active)");
                         }
                     });
                 });

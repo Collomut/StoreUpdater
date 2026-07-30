@@ -1,5 +1,6 @@
 package com.stockmanager.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,14 +9,14 @@ public class Sale {
     private int id;
     private int shopId;
     private LocalDate saleDate;
-    private double totalAmount;
+    private BigDecimal totalAmount = BigDecimal.ZERO;
     private String notes;
     private String receiptNumber;
     private List<SaleItem> items = new ArrayList<>();
 
     public Sale() {}
 
-    public Sale(int id, int shopId, LocalDate saleDate, double totalAmount,
+    public Sale(int id, int shopId, LocalDate saleDate, BigDecimal totalAmount,
                 String notes, String receiptNumber) {
         this.id = id; this.shopId = shopId; this.saleDate = saleDate;
         this.totalAmount = totalAmount; this.notes = notes;
@@ -28,8 +29,8 @@ public class Sale {
     public void setShopId(int shopId) { this.shopId = shopId; }
     public LocalDate getSaleDate() { return saleDate; }
     public void setSaleDate(LocalDate saleDate) { this.saleDate = saleDate; }
-    public double getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
+    public BigDecimal getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
     public String getReceiptNumber() { return receiptNumber; }

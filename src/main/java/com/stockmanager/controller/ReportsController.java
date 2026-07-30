@@ -65,7 +65,7 @@ public class ReportsController {
                     .filter(s -> !s.getSaleDate().isBefore(weekStart))
                     .collect(Collectors.groupingBy(
                         com.stockmanager.model.Sale::getSaleDate,
-                        Collectors.summingDouble(com.stockmanager.model.Sale::getTotalAmount)));
+                        Collectors.summingDouble(s -> s.getTotalAmount().doubleValue())));
                 r.weekDays = new ArrayList<>(); r.weekValues = new ArrayList<>(); r.weekTotal = 0;
                 for (int i = 6; i >= 0; i--) {
                     LocalDate d = now.minusDays(i);
@@ -79,7 +79,7 @@ public class ReportsController {
                     .filter(s -> s.getSaleDate().getYear() == year)
                     .collect(Collectors.groupingBy(
                         s -> s.getSaleDate().getMonthValue(),
-                        Collectors.summingDouble(com.stockmanager.model.Sale::getTotalAmount)));
+                        Collectors.summingDouble(s -> s.getTotalAmount().doubleValue())));
                 r.monthNames = new ArrayList<>(); r.monthValues = new ArrayList<>();
                 r.yearTotal = 0; r.monthTotal = 0;
                 int curMonth = now.getMonthValue();
@@ -94,7 +94,7 @@ public class ReportsController {
                 Map<Integer, Double> byYear = allSales.stream()
                     .collect(Collectors.groupingBy(
                         s -> s.getSaleDate().getYear(),
-                        Collectors.summingDouble(com.stockmanager.model.Sale::getTotalAmount)));
+                        Collectors.summingDouble(s -> s.getTotalAmount().doubleValue())));
                 r.annualYears = new ArrayList<>(); r.annualValues = new ArrayList<>();
                 for (int y2 = curYear - 4; y2 <= curYear; y2++) {
                     r.annualYears.add(String.valueOf(y2));

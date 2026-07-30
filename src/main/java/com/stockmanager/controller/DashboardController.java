@@ -38,13 +38,12 @@ public class DashboardController {
             @Override protected DashboardData call() {
                 DatabaseManager db = DatabaseManager.getInstance();
                 DashboardData d = new DashboardData();
-                // 2 round-trips instead of 7
-                double[] stats = db.getDashboardStats(shopId);
-                d.today    = stats[0];
-                d.week     = stats[1];
-                d.month    = stats[2];
-                d.stockVal = stats[3];
-                d.lowCount = (int) stats[4];
+                java.math.BigDecimal[] stats = db.getDashboardStats(shopId);
+                d.today    = stats[0].doubleValue();
+                d.week     = stats[1].doubleValue();
+                d.month    = stats[2].doubleValue();
+                d.stockVal = stats[3].doubleValue();
+                d.lowCount = stats[4].intValue();
                 // 1 more round-trip for the list itself
                 d.lowProducts = db.getLowStockProducts(shopId);
                 // USD rate comes from cache (no extra round-trip after first load)

@@ -65,13 +65,16 @@ public class AutoUpdater {
                 String latestVersion  = extractField(json, "version");
                 String releaseNotes   = extractField(json, "release_notes");
 
-                // Choose the right download URL for this platform
+                // Choose the right download URL and signature for this platform
                 String downloadUrl;
+                String signature;
                 if (IS_LINUX_APPIMAGE) {
                     downloadUrl = extractField(json, "download_url_linux");
                     if (downloadUrl == null) downloadUrl = extractField(json, "download_url");
+                    signature = extractField(json, "signature_linux");
                 } else {
                     downloadUrl = extractField(json, "download_url");
+                    signature = extractField(json, "signature");
                 }
 
                 if (latestVersion == null || downloadUrl == null) return;
@@ -80,8 +83,9 @@ public class AutoUpdater {
                 // Newer version found — switch to JavaFX thread for UI
                 final String url   = downloadUrl;
                 final String notes = releaseNotes != null ? releaseNotes : "";
+                final String sig   = signature;
                 Platform.runLater(() ->
-                    showUpdateDialog(ownerStage, latestVersion, url, notes));
+                    showUpdateDialog(ownerStage, latestVersion, url, notes, sig));
 
             } catch (Exception ignored) {
                 // Network unavailable or JSON malformed — app continues normally
@@ -94,7 +98,7 @@ public class AutoUpdater {
     // ── Update-available dialog ───────────────────────────────────────────────
 
     private static void showUpdateDialog(Stage owner, String newVersion,
-                                         String downloadUrl, String notes) {
+                                         String downloadUrl, String notes, String sig) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.initOwner(owner);
         alert.setTitle("Update Available");
@@ -110,14 +114,43 @@ public class AutoUpdater {
 
         alert.showAndWait().ifPresent(btn -> {
             if (btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                downloadAndApply(owner, newVersion, downloadUrl);
+                downloadAndApply(owner, newVersion, downloadUrl, sig);
             }
         });
     }
 
     // ── Download + progress dialog ────────────────────────────────────────────
 
-    private static void downloadAndApply(Stage owner, String newVersion, String downloadUrl) {
+    private static final String PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvB6reZfTkoo0yMPsVH2/yFOfwXePR+lI37tiaRrxHRY09ebMhWA8i5/fuiS9gXyXhfIpRlgwSMiexy3MlXjtL56AuXe0XrADX8mOqZPYLwlL0kO+CL3OeDnIjffX1bgMNcN060GJnGYK71tag7RbNHs8QL8wrGg8r7VLWp+U/p/BJxP0WNQ64CRK0U4bmiAWOWBhk8YbRETFUid/V0jDzxi9dex/mT9wx+f90TVRY5DKEU39JmSZ7VtfwqvvDoT+fLyB+Fk2sB1/1+lUEh34H9mBYbDkzAIVdVqd7gm+TA5nCAc28CpyCvNAmW+W8eNF1npFNU4cCUKIQOGDWinuaQIDAQAB";
+
+    public static boolean verifyFileSignature(Path filePath, String base64Signature, String base64PublicKey) {
+        try {
+            if (base64Signature == null || base64Signature.isBlank()) return false;
+            byte[] publicKeyBytes = java.util.Base64.getDecoder().decode(base64PublicKey.replaceAll("\\s+", ""));
+            byte[] signatureBytes = java.util.Base64.getDecoder().decode(base64Signature.replaceAll("\\s+", ""));
+
+            java.security.spec.X509EncodedKeySpec spec = new java.security.spec.X509EncodedKeySpec(publicKeyBytes);
+            java.security.KeyFactory kf = java.security.KeyFactory.getInstance("RSA");
+            java.security.PublicKey publicKey = kf.generatePublic(spec);
+
+            java.security.Signature sign = java.security.Signature.getInstance("SHA256withRSA");
+            sign.initVerify(publicKey);
+
+            try (InputStream is = Files.newInputStream(filePath)) {
+                byte[] buffer = new byte[8192];
+                int read;
+                while ((read = is.read(buffer)) != -1) {
+                    sign.update(buffer, 0, read);
+                }
+            }
+            return sign.verify(signatureBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static void downloadAndApply(Stage owner, String newVersion, String downloadUrl, String sig) {
         // Determine file suffix based on what we're downloading
         String suffix = IS_LINUX_APPIMAGE ? ".AppImage" : ".jar";
 
@@ -167,7 +200,22 @@ public class AutoUpdater {
 
         downloadTask.setOnSucceeded(e -> {
             progressDialog.close();
-            applyUpdate(downloadTask.getValue());
+            Path file = downloadTask.getValue();
+            if (sig == null || sig.isBlank()) {
+                new Alert(Alert.AlertType.ERROR,
+                    "Update verification failed:\nNo cryptographic signature was found in the update manifest.",
+                    ButtonType.OK).showAndWait();
+                try { Files.deleteIfExists(file); } catch (Exception ignored) {}
+                return;
+            }
+            if (!verifyFileSignature(file, sig, PUBLIC_KEY)) {
+                new Alert(Alert.AlertType.ERROR,
+                    "Security warning:\nCryptographic signature verification failed! The download may have been tampered with or corrupted. Aborting update.",
+                    ButtonType.OK).showAndWait();
+                try { Files.deleteIfExists(file); } catch (Exception ignored) {}
+                return;
+            }
+            applyUpdate(file);
         });
 
         downloadTask.setOnFailed(e -> {
