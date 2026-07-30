@@ -38,6 +38,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'microsoft'
+          cache: 'maven'
 
       - name: Write config.properties (from secrets)
         shell: pwsh
@@ -107,6 +108,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'microsoft'
+          cache: 'maven'
 
       - name: Install build dependencies
         run: |
