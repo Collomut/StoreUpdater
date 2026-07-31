@@ -34,32 +34,36 @@ public class DatabaseManager {
             // ─── Dynamic Config Migration from GitHub ───────────────────────
             String apiUrl = props.getProperty("api.url");
             
-            try {
-                // Fetch the latest version.json from GitHub to locate the backend URL dynamically
-                String json = com.stockmanager.util.AutoUpdater.fetchUrl(
-                    "https://raw.githubusercontent.com/Collomut/StoreUpdater/main/version.json", 
-                    3000
-                );
-                if (json != null) {
-                    String onlineApiUrl = com.stockmanager.util.AutoUpdater.extractField(json, "api_url");
-                    if (onlineApiUrl != null && !onlineApiUrl.isBlank()) {
-                        // If api.url is missing, or is different, or we still have old credentials:
-                        if (apiUrl == null || !apiUrl.equals(onlineApiUrl) || props.containsKey("db.url")) {
-                            apiUrl = onlineApiUrl;
-                            props.setProperty("api.url", apiUrl);
-                            
-                            // Delete old insecure database credentials
-                            props.remove("db.url");
-                            props.remove("db.user");
-                            props.remove("db.password");
-                            
-                            // Save updated configuration back to disk
-                            saveConfig(props);
+            boolean isLocal = apiUrl != null && (apiUrl.contains("localhost") || apiUrl.contains("127.0.0.1"));
+            
+            if (!isLocal) {
+                try {
+                    // Fetch the latest version.json from GitHub to locate the backend URL dynamically
+                    String json = com.stockmanager.util.AutoUpdater.fetchUrl(
+                        "https://raw.githubusercontent.com/Collomut/StoreUpdater/main/version.json", 
+                        3000
+                    );
+                    if (json != null) {
+                        String onlineApiUrl = com.stockmanager.util.AutoUpdater.extractField(json, "api_url");
+                        if (onlineApiUrl != null && !onlineApiUrl.isBlank()) {
+                            // If api.url is missing, or is different, or we still have old credentials:
+                            if (apiUrl == null || !apiUrl.equals(onlineApiUrl) || props.containsKey("db.url")) {
+                                apiUrl = onlineApiUrl;
+                                props.setProperty("api.url", apiUrl);
+                                
+                                // Delete old insecure database credentials
+                                props.remove("db.url");
+                                props.remove("db.user");
+                                props.remove("db.password");
+                                
+                                // Save updated configuration back to disk
+                                saveConfig(props);
+                            }
                         }
                     }
+                } catch (Exception ignored) {
+                    // If offline or network timeout, proceed with whatever is already in local config
                 }
-            } catch (Exception ignored) {
-                // If offline or network timeout, proceed with whatever is already in local config
             }
 
             if (apiUrl == null || apiUrl.isBlank()) {
