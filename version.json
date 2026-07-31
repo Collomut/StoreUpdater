@@ -1,9 +1,9 @@
 {
-  "version": "1.3.1",
+  "version": "1.3.2",
   "api_url": "https://stockmanager-api.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.1/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.1/StockManager-1.3.1-x86_64.AppImage",
-  "release_notes": "Release 3.1: Automatic dynamic config.properties migration to remote REST API URL",
-  "signature": "FqgI6HHXrTWKtquBLmwkVShW2Ov45S6v4LEaXo27uuuWd2fJsIrGoa4pE/EDUIHHLDPUl9P1KBDlvS8o9F3mb2Oy3aTZcLC9hShWJzEb8TgvuUSyYMa8adBRiMVzyWu98vbQGmOpnJzo3kBiWK7JMuKp+1yL5eelFBwzyFdDKDS6nGI3JgIgcwX1Tt26FVXFqLTf0tXrxFH4r2YQ0/hKGNEIRSR60sBzJgcvRQa38b2zvZZUl+Bly2YpOn19W3uIMslW6RSMBEzpifuUo/V5DFu+AsR9qfFe9baQWy9LocHOc72ya8URloCtBfBQ/AmytSmLrLz5Gkmm99/LvXCB1Q==",
-  "signature_linux": "Qco9VAz94vIx8kfqAWBRLYD3sLgqWrc0HFUEqrOOeYxAoyneZK3ZPghrXQ4hq/LPjUsxwh1VhmYeSDWM98jMnm1X9WeJvgrTIkF2NdeSrYKsKD7mv4zoLhw7w0WS1cRaEv2wwLbZ2WKTYCDYkGzEwrmiD9Vb00fXIUrFTTxSLcFKW3QmHpsumfhtIoNdld5v3QNdwPHafco/g44/Toew+29PWm6YCS+nLTJZRWge6GtdfcxdSx9yof3uPZq4WibQPSeYfkSCpfNjOipKCoOWq6eZCmmiNaVVktcQD/h+SSW/6kdLpgExsRK3h9+UTv0B2anRkkptZa2dlpdgKkfr+A=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.2/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.2/StockManager-1.3.2-x86_64.AppImage",
+  "release_notes": "Release 3.2: Exclude localhost setups from auto-migration for developer testing",
+  "signature": "SxfceqBvHXAVrr0BJ7glJIyMWJSuh69vEcrQ6dF8vg1aPbWRtNXWNQlXs/4m4fH/K3wjGiMi84nC5jO8ct1r/FjkbdRVHPovjWrjJceiPikwC9v6xgtRopeth3G3xOnhAGCjBVOWyrgMFadhb+qgSrFPvJxYASPRQR8bN0mdDSrNMFt0nke4GC+DC3Q/fSj/SQEuiIvKi+6dSugCOpJWeEzZrYLKSlimqfTTWL6t24I4p52uNPtWml6RIxmLBM8Z2VzaO1qb2ZMep9L526myDBxVd2jZb1teVFl7b60RMZoOh9hECcvw0U7VOxMnTkQXxUUBhzTFAe0IkFSuiDGerg==",
+  "signature_linux": "AqjHTAT4D+skOID8tlYdc0TBdra0tnHSziUmi/03vBVwqsUnBofh9noEVteVwKPL5J1EGyIgeX9d5hC14TenBDVfSUdd8ZAmUl1P/mYE2FHntQQ6mLQU9+Qyuco4/I3cLyNPB0NepjJuqLTFwMUNZkAo6pykIYNaklSgoYghUAHBitBelOfcGzsmA2lKbFr4Jm0YP2JplDrfTaZQ020v4lwTkPHv3nV7RACDBhtGrUaT6p1Cfv5E/Omzp37oQo8GUFRVxnrYFDU7lfPTALJYLyIo1rlm5i5Lyf+rWjtqUtoXFvFD6y+3UxkfVsdEgkUAFg9jdCW8uMsMbBJwp2COxA=="
 }
