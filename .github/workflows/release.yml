@@ -245,10 +245,14 @@ jobs:
           # 5. Clean up temporary keys/signatures
           rm -f key.der key.pem jar.sig appimage.sig
 
-          # 6. Generate the signed version.json
+          # 6. Extract previous api_url if it exists
+          PREV_API_URL=$(grep -oP '"api_url"\s*:\s*"\K[^"]+' version.json || echo "https://stockmanager-api.onrender.com")
+
+          # 7. Generate the signed version.json
           cat > version.json << EOF
           {
             "version": "${VERSION}",
+            "api_url": "${PREV_API_URL}",
             "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v${VERSION}/StockManager-1.0.0.jar",
             "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v${VERSION}/StockManager-${VERSION}-x86_64.AppImage",
             "release_notes": "${NOTES}",
