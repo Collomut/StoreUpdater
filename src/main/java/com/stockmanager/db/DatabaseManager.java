@@ -30,8 +30,41 @@ public class DatabaseManager {
     private DatabaseManager() {
         try {
             Properties props = loadConfig();
-            // Configure the HTTP REST Client connection endpoint
-            String apiUrl = props.getProperty("api.url", "http://localhost:3000");
+            
+            // ─── Dynamic Config Migration from GitHub ───────────────────────
+            String apiUrl = props.getProperty("api.url");
+            
+            try {
+                // Fetch the latest version.json from GitHub to locate the backend URL dynamically
+                String json = com.stockmanager.util.AutoUpdater.fetchUrl(
+                    "https://raw.githubusercontent.com/Collomut/StoreUpdater/main/version.json", 
+                    3000
+                );
+                if (json != null) {
+                    String onlineApiUrl = com.stockmanager.util.AutoUpdater.extractField(json, "api_url");
+                    if (onlineApiUrl != null && !onlineApiUrl.isBlank()) {
+                        // If api.url is missing, or is different, or we still have old credentials:
+                        if (apiUrl == null || !apiUrl.equals(onlineApiUrl) || props.containsKey("db.url")) {
+                            apiUrl = onlineApiUrl;
+                            props.setProperty("api.url", apiUrl);
+                            
+                            // Delete old insecure database credentials
+                            props.remove("db.url");
+                            props.remove("db.user");
+                            props.remove("db.password");
+                            
+                            // Save updated configuration back to disk
+                            saveConfig(props);
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+                // If offline or network timeout, proceed with whatever is already in local config
+            }
+
+            if (apiUrl == null || apiUrl.isBlank()) {
+                apiUrl = "http://localhost:3000"; // default fallback
+            }
             HttpDatabaseClient.setBackendUrl(apiUrl);
 
             // Instantiate repositories
@@ -42,6 +75,21 @@ public class DatabaseManager {
             saleRepository = new SaleRepository(this);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize backend API connection: " + e.getMessage(), e);
+        }
+    }
+
+    private void saveConfig(Properties props) {
+        File external = null;
+        String appPath = System.getProperty("jpackage.app-path");
+        if (appPath != null) {
+            external = new File(new File(appPath).getParent(), "config.properties");
+        } else {
+            external = new File(System.getProperty("user.dir"), "config.properties");
+        }
+        try (java.io.FileOutputStream fos = new java.io.FileOutputStream(external)) {
+            props.store(fos, "Stock Manager Configurations - Auto-Migrated");
+        } catch (Exception e) {
+            System.err.println("Could not auto-save config migration: " + e.getMessage());
         }
     }
 

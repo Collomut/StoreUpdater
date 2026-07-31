@@ -393,7 +393,7 @@ public class AutoUpdater {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static String fetchUrl(String urlStr, int timeoutMs) throws Exception {
+    public static String fetchUrl(String urlStr, int timeoutMs) throws Exception {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setConnectTimeout(timeoutMs);
@@ -410,7 +410,7 @@ public class AutoUpdater {
     }
 
     /** Extracts a string value from a simple flat JSON object. */
-    private static String extractField(String json, String field) {
+    public static String extractField(String json, String field) {
         Matcher m = Pattern.compile(
             "\"" + Pattern.quote(field) + "\"\\s*:\\s*\"([^\"]+)\"")
             .matcher(json);

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: stockmanager-api
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+        description: "PostgreSQL Database URL (e.g. Supabase connection string)"
+      - key: JWT_SECRET
+        generateValue: true
+        description: "Secret key for JWT session tokens"
+      - key: PORT
+        value: 10000
