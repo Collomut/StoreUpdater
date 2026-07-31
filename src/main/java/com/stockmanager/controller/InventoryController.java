@@ -18,7 +18,7 @@ public class InventoryController {
     @FXML private TableView<Product> productTable;
     @FXML private TableColumn<Product, String>  colName, colCategory, colUnit, colStatus;
     @FXML private TableColumn<Product, Integer> colQty;
-    @FXML private TableColumn<Product, Double>  colPrice;
+    @FXML private TableColumn<Product, java.math.BigDecimal>  colPrice;
     @FXML private TextField searchField;
     @FXML private Label lblTotal, lblLowStock;
 
@@ -41,9 +41,10 @@ public class InventoryController {
         colPrice.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
         colPrice.setCellFactory(col -> new TableCell<>() {
-            protected void updateItem(Double item, boolean empty) {
+            @Override
+            protected void updateItem(java.math.BigDecimal item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : String.format("RWF %,.0f", item));
+                setText(empty || item == null ? null : String.format("RWF %,.0f", item.doubleValue()));
             }
         });
 
