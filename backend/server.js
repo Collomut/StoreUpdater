@@ -186,6 +186,9 @@ app.use('/api/sales', authenticateToken, salesRouter);
 app.use('/api/shops', authenticateToken, shopsRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/users', authenticateToken, usersRouter);
+app.get('/', (req, res) => {
+  res.json({ status: 'Stock Manager API Backend is running.' });
+});
 
 // Global Error Handler
 app.use((err, req, res, next) => {
