@@ -6,13 +6,10 @@ import com.stockmanager.model.SaleItem;
 import com.stockmanager.model.Shop;
 import com.stockmanager.model.User;
 import com.stockmanager.util.PasswordUtil;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.sql.*;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -23,7 +20,6 @@ import java.util.Properties;
 public class DatabaseManager {
 
     private static DatabaseManager instance;
-    private HikariDataSource dataSource;
 
     private final SettingsRepository settingsRepository;
     private final UserRepository userRepository;
@@ -34,19 +30,9 @@ public class DatabaseManager {
     private DatabaseManager() {
         try {
             Properties props = loadConfig();
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(props.getProperty("db.url"));
-            config.setUsername(props.getProperty("db.user"));
-            config.setPassword(props.getProperty("db.password"));
-            config.setMinimumIdle(2);
-            config.setMaximumPoolSize(5);
-            config.setConnectionTimeout(15000);
-            config.setIdleTimeout(60000);
-            config.setMaxLifetime(300000);
-            config.setKeepaliveTime(30000);
-            config.setConnectionTestQuery("SELECT 1");
-            config.setAutoCommit(true);
-            dataSource = new HikariDataSource(config);
+            // Configure the HTTP REST Client connection endpoint
+            String apiUrl = props.getProperty("api.url", "http://localhost:3000");
+            HttpDatabaseClient.setBackendUrl(apiUrl);
 
             // Instantiate repositories
             settingsRepository = new SettingsRepository(this);
@@ -54,23 +40,14 @@ public class DatabaseManager {
             shopRepository = new ShopRepository(this);
             productRepository = new ProductRepository(this);
             saleRepository = new SaleRepository(this);
-
-            try (Connection conn = getConn()) {
-                createTables(conn);
-                seedDefaultData(conn);
-            }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to connect to database: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to initialize backend API connection: " + e.getMessage(), e);
         }
     }
 
     public static synchronized DatabaseManager getInstance() {
         if (instance == null) instance = new DatabaseManager();
         return instance;
-    }
-
-    Connection getConn() throws SQLException {
-        return dataSource.getConnection();
     }
 
     private Properties loadConfig() throws Exception {
@@ -91,112 +68,7 @@ public class DatabaseManager {
         try (InputStream is = getClass().getResourceAsStream("/config.properties")) {
             if (is != null) { props.load(is); return props; }
         }
-        throw new RuntimeException("config.properties not found. Place it next to the JAR/EXE file.");
-    }
-
-    private void createTables(Connection conn) throws SQLException {
-        Statement stmt = conn.createStatement();
-        stmt.execute("""
-            CREATE TABLE IF NOT EXISTS shops (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                description TEXT
-            )
-        """);
-        stmt.execute("""
-            CREATE TABLE IF NOT EXISTS products (
-                id SERIAL PRIMARY KEY,
-                shop_id INTEGER NOT NULL REFERENCES shops(id),
-                name VARCHAR(200) NOT NULL,
-                category VARCHAR(100),
-                sku VARCHAR(50),
-                unit VARCHAR(50),
-                quantity INTEGER NOT NULL DEFAULT 0,
-                reorder_level INTEGER NOT NULL DEFAULT 5,
-                cost_price NUMERIC(12,2) NOT NULL DEFAULT 0,
-                selling_price NUMERIC(12,2) NOT NULL DEFAULT 0
-            )
-        """);
-        stmt.execute("""
-            CREATE TABLE IF NOT EXISTS sales (
-                id SERIAL PRIMARY KEY,
-                shop_id INTEGER NOT NULL REFERENCES shops(id),
-                sale_date DATE NOT NULL,
-                total_amount NUMERIC(12,2) NOT NULL,
-                receipt_number VARCHAR(50)
-            )
-        """);
-        stmt.execute("""
-            CREATE TABLE IF NOT EXISTS sale_items (
-                id SERIAL PRIMARY KEY,
-                sale_id INTEGER NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
-                product_id INTEGER NOT NULL REFERENCES products(id),
-                quantity_sold INTEGER NOT NULL,
-                unit_price NUMERIC(12,2) NOT NULL
-            )
-        """);
-        stmt.execute("""
-            CREATE TABLE IF NOT EXISTS settings (
-                key VARCHAR(100) PRIMARY KEY,
-                value TEXT NOT NULL
-            )
-        """);
-        stmt.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(50) UNIQUE NOT NULL,
-                password_hash VARCHAR(255) NOT NULL,
-                role VARCHAR(20) NOT NULL DEFAULT 'WORKER',
-                shop_id INTEGER REFERENCES shops(id),
-                must_change_password BOOLEAN NOT NULL DEFAULT FALSE,
-                failed_attempts INTEGER NOT NULL DEFAULT 0,
-                locked_until TIMESTAMP
-            )
-        """);
-
-        // ─── Schema Auto-Migrations ──────────────────────────────────────────
-        try {
-            stmt.execute("ALTER TABLE products ALTER COLUMN cost_price TYPE NUMERIC(12,2)");
-            stmt.execute("ALTER TABLE products ALTER COLUMN selling_price TYPE NUMERIC(12,2)");
-            stmt.execute("ALTER TABLE sales ALTER COLUMN total_amount TYPE NUMERIC(12,2)");
-            stmt.execute("ALTER TABLE sale_items ALTER COLUMN unit_price TYPE NUMERIC(12,2)");
-        } catch (SQLException e) {
-            System.out.println("Column type migrations completed or skipped: " + e.getMessage());
-        }
-
-        try {
-            stmt.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN NOT NULL DEFAULT FALSE");
-            stmt.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_attempts INTEGER NOT NULL DEFAULT 0");
-            stmt.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP");
-        } catch (SQLException e) {
-            System.out.println("User table schema columns migrations completed or skipped: " + e.getMessage());
-        }
-    }
-
-    private void seedDefaultData(Connection conn) throws SQLException {
-        ResultSet rs = conn.createStatement().executeQuery("SELECT COUNT(*) FROM shops");
-        rs.next();
-        if (rs.getInt(1) == 0) {
-            PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO shops (name, description) VALUES (?, ?)");
-            ps.setString(1, "Shoes Shop");        ps.setString(2, "Footwear & accessories");           ps.execute();
-            ps.setString(1, "Curios Shop");       ps.setString(2, "Souvenirs & curio items");          ps.execute();
-            ps.setString(1, "Beads & Hats Shop"); ps.setString(2, "Beads, hats & fashion accessories"); ps.execute();
-        }
-        settingsRepository.setDefaultSetting(conn, "usd_rate", "1380");
-        settingsRepository.setDefaultSetting(conn, "receipt_counter", "1");
-
-        ResultSet ur = conn.createStatement().executeQuery("SELECT COUNT(*) FROM users");
-        ur.next();
-        if (ur.getInt(1) == 0) {
-            ResultSet shops = conn.createStatement().executeQuery("SELECT id FROM shops ORDER BY id");
-            List<Integer> ids = new ArrayList<>();
-            while (shops.next()) ids.add(shops.getInt(1));
-            userRepository.createUserIfAbsent(conn, "admin",  "admin123",  "ADMIN",  null, true);
-            if (ids.size() >= 1) userRepository.createUserIfAbsent(conn, "shop1", "shop1pass", "WORKER", ids.get(0), true);
-            if (ids.size() >= 2) userRepository.createUserIfAbsent(conn, "shop2", "shop2pass", "WORKER", ids.get(1), true);
-            if (ids.size() >= 3) userRepository.createUserIfAbsent(conn, "shop3", "shop3pass", "WORKER", ids.get(2), true);
-        }
+        return props; // return empty properties, will fall back to default localhost URL
     }
 
     // ─── Getters for Repository Sub-classes ─────────────────────────────────

@@ -48,25 +48,18 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- PostgreSQL JDBC -->
+        <!-- Gson for REST API client requests mapping -->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.2</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
         </dependency>
 
-        <!-- BCrypt password hashing -->
+        <!-- BCrypt password hashing (retained for fallback and local utility) -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
-        </dependency>
-
-        <!-- HikariCP connection pool — reuses DB connections, removes per-query overhead -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.1.0</version>
         </dependency>
 
         <!-- Logback classic -->
