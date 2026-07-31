@@ -16,7 +16,8 @@
 | **Bargain pricing** | Downtown shop supports per-sale price overrides for negotiated sales |
 | **Reports & history** | View daily/weekly/monthly sales summaries and full transaction history |
 | **Low stock alerts** | Products highlighted when stock drops below reorder level |
-| **Product retirement** | Retire discontinued products without deleting history |
+| **Product retirement** | Discontinue products cleanly without losing historical sales reports |
+| **Maximum Security** | Database credentials remain hidden in the cloud; client talks strictly via HTTPS using JWT |
 | **Auto-updater** | App checks GitHub for updates on every launch and updates itself silently |
 | **Standalone EXE** | No Java installation required on shop PCs — bundled JRE included |
 
@@ -32,37 +33,26 @@
 
 ---
 
-## 🖥️ System Requirements
-
-| Requirement | Minimum |
-|---|---|
-| Operating System | Windows 10 / Windows 11 |
-| RAM | 4 GB |
-| Storage | 500 MB free |
-| Internet | Required for auto-updates (optional otherwise) |
-| Java | **Not required** — bundled inside the app |
-
----
-
 ## 🚀 Installation & Deployment
 
-### For a new PC (first time setup)
+### 1. Deploy the Backend Proxy (API)
+The central database is securely isolated behind a Node.js Express proxy.
+1. Log in to your Render account, click **New +** -> **Blueprint**.
+2. Connect this repository and choose the `main` branch.
+3. Render will read the `render.yaml` blueprint. Provide your Supabase database connection string under `DATABASE_URL` env variable.
+4. Click **Apply**. Render will deploy the API server and provide a public URL (e.g. `https://stockmanager-api-4hw3.onrender.com`).
 
-1. Download the latest release from the [Releases page](https://github.com/Collomut/StoreUpdater/releases)
-2. Download `StockManager-1.0.0.jar` from the release assets
-3. Copy the entire `StockManager/` folder (containing the `.exe`) to the target PC
-4. Double-click `StockManager.exe`
-5. Login with your credentials
+### 2. Configure Client URLs
+The Java client dynamically configures itself on startup.
+- Edit the `api_url` parameter inside `version.json` in your GitHub repository to point to your live Render backend URL.
+- When shop PCs open the app, they will automatically download the manifest, update their local `config.properties`, and connect to the secure API.
 
-> **No Java installation required.** The JRE is bundled inside the app folder.
-
-### For developers (building from source)
-
+### 3. Build & Run Client
 ```bash
 # Build the JAR
 mvn package
 
-# Build the standalone EXE (Windows)
+# Build the standalone Windows installer
 build_release.bat
 ```
 
@@ -76,14 +66,8 @@ The app checks this GitHub repository for updates **every time it launches**.
 1. App starts → silently fetches `version.json` from this repo.
 2. If a newer version is available → shows an update prompt.
 3. Staff click **"Update Now"** → downloads new version in background with progress bar.
-4. **Cryptographic Signature Verification**: The downloaded binary's SHA-256 hash is verified against the signature in `version.json` using an embedded RSA public key. If verification fails, the file is deleted and the update is aborted.
+4. **Cryptographic Signature Verification**: The downloaded binary's SHA-256 hash is verified against the signature in `version.json` using an embedded RSA public key. If verification fails, the update is aborted.
 5. App restarts automatically with the new version.
-
-**Update flow for the developer (releasing a new version):**
-1. Make code changes and push to `main` branch.
-2. Trigger the manual **Build & Release** workflow in GitHub Actions.
-3. The workflow automatically builds the EXE installer and Linux AppImage, signs them using `AUTO_UPDATE_PRIVATE_KEY` repository secret, updates `version.json` with the new version and Base64 signatures, and publishes a new GitHub Release.
-4. All shop PCs update automatically on next launch.
 
 ---
 
@@ -91,36 +75,22 @@ The app checks this GitHub repository for updates **every time it launches**.
 
 ```
 StoreUpdater/
-├── version.json        ← Current version info (checked by the app on startup)
+├── backend/            ← Node.js Express API server proxy code
+├── render.yaml         ← Render Blueprint deployment file
+├── version.json        ← Current version and dynamic API URL info
 ├── README.md           ← This file
 ├── USER_MANUAL.md      ← Full staff user manual
-└── releases/           ← GitHub Releases (JAR assets attached per release)
+└── src/                ← JavaFX desktop client source code
 ```
 
 ---
 
 ## 🔑 Default Login Credentials
 
-> ⚠️ Change these after first login via Settings.
-
 | Username | Password | Role |
 |---|---|---|
-| `admin` | *(set during setup)* | Administrator |
+| `admin` | `admin123` | Administrator |
 | *(shop staff)* | *(set by admin)* | Worker |
-
----
-
-## 🗄️ Database
-
-- Hosted on **Supabase** (PostgreSQL in the cloud)
-- All shops share the same central database over the internet
-- Data is **never affected** by app updates
-
----
-
-## 📄 Documentation
-
-- 📘 [User Manual](USER_MANUAL.md) — Step-by-step guide for shop staff
 
 ---
 
@@ -128,8 +98,12 @@ StoreUpdater/
 
 | Version | Date | Summary |
 |---|---|---|
-| `1.2.0` | 2026-07-30 | Security & Architectural: Cryptographic update signing, login rate-limiting lockout, forced password change dialog, logback file logging, JUnit 5 test suite, database repository pattern refactoring. Shaded JAR excludes config properties. |
-| `1.1.0` | 2026-07-29 | Icon & Linux Relaunch: Generated Microsoft multi-resolution ICO file (16x16, 32x32, 48x48, 256x256 resolutions) to fix blank taskbar shortcut icons. Fixed Linux "Text file busy" restart lockouts using file unlinking, and supported relaunching on FUSE-less Linux VMs. |
+| `1.3.3` | 2026-07-31 | Layout Hotfix: Updated `colPrice` type to `BigDecimal` in `InventoryController` to resolve runtime ClassCastException layout rendering crashes. |
+| `1.3.2` | 2026-07-31 | Local Dev Mode: Excluded localhost / 127.0.0.1 settings from automatic version.json config migration. |
+| `1.3.1` | 2026-07-31 | Auto-Migration: Enabled dynamic auto-migration of local `config.properties` using `api_url` from GitHub version.json. Wipes old JDBC passwords. |
+| `1.3.0` | 2026-07-31 | REST API Backend: Migrated database access to a secure Express API backend. Removed JDBC drivers & connection pools from desktop client binary. |
+| `1.2.0` | 2026-07-30 | Security: Cryptographic update signing, login rate lockout, forced password change dialog, logback file logging, and JUnit 5 test suite. |
+| `1.1.0` | 2026-07-29 | Icon & Linux Relaunch: Generated ICO files for taskbar shortcut icons. Resolved Linux "Text file busy" restart lockouts using file unlinking. |
 | `1.0.1` | 2026-07-29 | Bug fixes: edit dialog pre-fill, sales colour display, bead sizes. Auto-updater introduced. |
 | `1.0.0` | 2026-07-27 | Initial release |
 
@@ -139,12 +113,15 @@ StoreUpdater/
 
 | Layer | Technology |
 |---|---|
-| Language | Java 21 |
-| UI Framework | JavaFX 21 |
-| Database | PostgreSQL (Supabase) |
-| Connection Pool | HikariCP |
-| Logging | SLF4J + Logback Classic |
-| Testing | JUnit 5 (Jupiter) |
-| Build Tool | Apache Maven |
-| Packaging | jpackage (JDK built-in) |
-| Update Hosting | GitHub Releases |
+| **Language** | Java 21 |
+| **Client UI** | JavaFX 21 |
+| **Client Parser** | Gson (JSON) |
+| **Backend Framework**| Node.js + Express |
+| **Database Pool** | pg (PostgreSQL connection pool on backend) |
+| **Database** | Supabase (PostgreSQL in the cloud) |
+| **Security** | JSON Web Tokens (JWT) + BCrypt password hashing |
+| **Logging** | SLF4J + Logback Classic (Client) + Winston/Console (Backend) |
+| **Testing** | JUnit 5 (Jupiter) |
+| **Build Tool** | Apache Maven |
+| **Packaging** | jpackage (JDK built-in) |
+| **Update Hosting** | GitHub Releases |
