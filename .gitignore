@@ -37,8 +37,7 @@ Desktop.ini
 GITHUB_README.md
 setup_test_*.exe
 
-# ── Node.js — never commit dependencies or lock files ────────────────────────
+# ── Node.js — ignore node_modules but track package-lock.json ───────────────
 node_modules/
 backend/node_modules/
-package-lock.json
-backend/package-lock.json
+

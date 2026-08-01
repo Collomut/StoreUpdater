@@ -14,3 +14,6 @@ services:
         description: "Secret key for JWT session tokens"
       - key: PORT
         value: 10000
+      - key: NODE_VERSION
+        value: 20.18.0
+
