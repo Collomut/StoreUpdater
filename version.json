@@ -1,9 +1,9 @@
 {
-  "version": "1.3.3",
+  "version": "1.3.4",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.3/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.3/StockManager-1.3.3-x86_64.AppImage",
-  "release_notes": "Release 3.3: Hotfix to resolve ClassCastException inside Inventory table rendering",
-  "signature": "lXH4g6rkNqEBy9eEzwjR3TeFNCOOCFMtDkRsUqFssopeZjVnpvtDfFqeqAaHV1OX6NsnOfbtYFuZ/cwdU9H30YOjbeN6nb7dpFSra2CIViEPDtdVVIJ5ENkmBIVoNM8JSdeHUGsTsoPiBkxebBSr3VO00knNJpnqNP7VLwDZ+5wtg62CWDQDTPaRSStljNuxvUnO0l7IkICzlPEo5htfvp1r11usdSk6JZc3qbfMlcm3FSAIp9n5BA60UZF2yzJitYaygV2sgmcoXV4Ia2uNGFVg6QIyy5D9PX1NfuE/M8Jwp7IMsfLND1+AV4VI9ocw2J6lsT8eKULJlPWNJVBW3g==",
-  "signature_linux": "KQiXB4tCJaUN3BK788ZLkhg6J6UUUEghvtNFnx5KKiOLsBxuN1QNa5awKVaeKqqHLzNnmxYWlXjsvB9gPJjoyYDATAwZ3FOLgeu3o8PPsnLPzU37GEr7//wC/VNMkCx5+4w3tHsdKIbg1AuH0rv7mkUUYVTirmYa6K0Xv3AaZqn5OUzr9TGO03AoI2hYPKgzj1ChpAiOGbEj1LzZKZK0pPQQlUzwojYVi79hwusjx9X797u38Fv4Nnyqk6RHJkCeqrL9sckjB0Ps7vTSmX5OnI1avp/099+/29wJcP4sEvB90HQNBgdgtE52oB0Xxqs784qTZ+ARXtTaRn+FbeRl3w=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.4/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.4/StockManager-1.3.4-x86_64.AppImage",
+  "release_notes": "Security: C1-C3 critical fixes, H1-H5 high fixes, M1-M5 medium fixes, L2-L5 low fixes, audit log, logout endpoint, weekly backup",
+  "signature": "Pgna5jl9HnZVFrF4oUURzVqYpj6yuuDgN06uni2Qwn6w5Mfkvmjz7rOdthUnVmjmANzKQJSbJkDRzUpYMTmMcXXXL4+l6Nul+1wbFHrgLAk1IN3ZJYlhuAwhRXpy4w5KaSB+soE8tudHWyfUxkyrz2zWVolFVmMMPGRgTJhZwAv8H9Qz8v8ac8Erm/zQblqAyekoKRL3j4qfoRJckRUWvcChxW2vDGVoP25FeVgwEl/fe3NlJVi/aJ07VU0oYx6XHyI3UByaBIsg5nOc8epbf+MNFiNVcL1kBjrwHOW2YYVgp8LrcilXSTsSQ0iESg8NIrIZwNLne179gEXtY9oUow==",
+  "signature_linux": "MBEaqa7T5TQl3DnpdGZ4qgGzAcmL6pMrq2Ojy0BVcCQEku0h5Uw+nTrTH3cCM9bTNQOUF6aLC3qnHvZWxulwXa9x4vtAbN/6lT4ukVAL1BD79e5QT8eMm6NgqlwMLYq7FURCpAMelQSM+H8qKoooRm7boxU8WH/6lA070u+Q1y9FEcyp7flKBG8ECmsv6YiKmZVShqF8yVdStUeJxx5ViQWmVeuMilI33ID/hrBZvOSizpre/PM5pyEL+50UDM5LcsMG7BA7GBAhZnOTQbYjBJC68FwCDXqWiMCcpgm/yOTRuspEwGkXCbmDn9i6bWt/SfwWpXcXvGH5HOkUmavxAg=="
 }
