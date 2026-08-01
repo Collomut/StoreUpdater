@@ -30,11 +30,11 @@ app.set('jwtSecret', JWT_SECRET);
 // ─── L-5: Security headers via helmet ────────────────────────────────────────
 app.use(helmet());
 
-// ─── C-2: Restrictive CORS — desktop client only, no browser cross-origin ─────
-// The app is a desktop JavaFX client. No browser needs cross-origin access.
-app.use(cors({ origin: false }));
+// ─── C-2: Desktop JavaFX client CORS policy ─────────────────────────────────
+app.use(cors());
 
 app.use(express.json({ limit: '1mb' }));
+
 
 // Trust Render's reverse proxy (needed for correct IP detection in rate limiter)
 app.set('trust proxy', 1);
@@ -45,6 +45,7 @@ const globalLimiter = rateLimit({
   max: 300,                    // max 300 requests per IP per minute
   standardHeaders: 'draft-7',
   legacyHeaders: false,
+  validate: false,
   message: { error: 'Too many requests. Please slow down.' }
 });
 
@@ -53,11 +54,13 @@ const loginLimiter = rateLimit({
   max: 20,                     // max 20 login attempts per IP per 15 minutes
   standardHeaders: 'draft-7',
   legacyHeaders: false,
+  validate: false,
   message: { error: 'Too many login attempts from this IP. Try again in 15 minutes.' }
 });
 
 app.use('/api/', globalLimiter);
 app.use('/api/auth/login', loginLimiter);
+
 
 // ─── JWT Authentication Middleware ───────────────────────────────────────────
 async function authenticateToken(req, res, next) {
