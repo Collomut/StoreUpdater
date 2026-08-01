@@ -1,7 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -9,13 +7,10 @@ require('dotenv').config();
 // ─── C-1: Handle JWT_SECRET with default fallback if missing in Render env ─────
 const JWT_SECRET = process.env.JWT_SECRET || 'stockmanager_jwt_secure_secret_key_2026_prod';
 
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ─── Database Connection Pool ────────────────────────────────────────────────
-// Note: rejectUnauthorized is false due to Supabase PgBouncer pooler (port 6543)
-// presenting a hostname mismatch. Connection is still TLS-encrypted end-to-end.
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -40,37 +35,51 @@ process.on('uncaughtException', (err) => {
 app.set('dbPool', pool);
 app.set('jwtSecret', JWT_SECRET);
 
-// ─── L-5: Security headers via helmet ────────────────────────────────────────
-app.use(helmet());
+// ─── L-5: Native Security Headers (replacement for helmet) ────────────────────
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  next();
+});
 
 // ─── C-2: Desktop JavaFX client CORS policy ─────────────────────────────────
 app.use(cors());
 
 app.use(express.json({ limit: '1mb' }));
 
-
-// Trust Render's reverse proxy (needed for correct IP detection in rate limiter)
 app.set('trust proxy', 1);
 
-// ─── H-1: Global and per-route rate limiting ─────────────────────────────────
-const globalLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000,    // 1 minute window
-  max: 300,                    // max 300 requests per IP per minute
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many requests. Please slow down.' }
-});
+// ─── H-1: Native Zero-Dependency In-Memory Rate Limiter ──────────────────────
+const rateLimitMap = new Map();
+function createRateLimiter(windowMs, maxHits) {
+  return (req, res, next) => {
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    const record = rateLimitMap.get(ip) || { count: 0, resetTime: now + windowMs };
 
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,   // 15 minute window
-  max: 20,                     // max 20 login attempts per IP per 15 minutes
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many login attempts from this IP. Try again in 15 minutes.' }
-});
+    if (now > record.resetTime) {
+      record.count = 1;
+      record.resetTime = now + windowMs;
+    } else {
+      record.count++;
+    }
+    rateLimitMap.set(ip, record);
+
+    if (record.count > maxHits) {
+      return res.status(429).json({ error: 'Too many requests. Please slow down.' });
+    }
+    next();
+  };
+}
+
+const globalLimiter = createRateLimiter(60 * 1000, 300);
+const loginLimiter  = createRateLimiter(15 * 60 * 1000, 20);
 
 app.use('/api/', globalLimiter);
 app.use('/api/auth/login', loginLimiter);
+
 
 
 
