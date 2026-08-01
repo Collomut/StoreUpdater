@@ -116,8 +116,9 @@ app.set('auditLog', auditLog);
 
 // ─── Schema Auto-Initialization (Run on Startup) ─────────────────────────────
 async function initializeDatabase() {
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     console.log('Initializing database schema if absent...');
 
     // Core tables
@@ -244,9 +245,9 @@ async function initializeDatabase() {
 
     console.log('Database initialization complete.');
   } catch (err) {
-    console.error('Error during database initialization:', err);
+    console.error('Error during database initialization:', err.message);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 }
 
@@ -275,9 +276,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-// Run Init and Start Server
-initializeDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Stock Manager API Backend listening on port ${PORT}`);
-  });
+// ─── Start Server then run DB init in background ─────────────────────────────
+// Start HTTP listener first so Render's health check on the port passes
+// immediately, even if the database takes a moment to warm up.
+app.listen(PORT, () => {
+  console.log(`Stock Manager API Backend listening on port ${PORT}`);
+});
+
+// Run schema migration and seeding in background — non-fatal if it fails
+initializeDatabase().catch(err => {
+  console.error('Non-fatal: Database initialization error on startup:', err.message);
 });
