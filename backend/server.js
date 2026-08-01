@@ -23,6 +23,19 @@ const pool = new Pool({
   }
 });
 
+// Prevent unhandled error crashes on idle pool clients
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle PostgreSQL client:', err.message);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err.message);
+});
+
 // Expose pool to routes
 app.set('dbPool', pool);
 app.set('jwtSecret', JWT_SECRET);
