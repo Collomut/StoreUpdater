@@ -56,23 +56,22 @@ app.set('trust proxy', 1);
 const globalLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,    // 1 minute window
   max: 300,                    // max 300 requests per IP per minute
-  standardHeaders: 'draft-7',
+  standardHeaders: true,
   legacyHeaders: false,
-  validate: false,
   message: { error: 'Too many requests. Please slow down.' }
 });
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,   // 15 minute window
   max: 20,                     // max 20 login attempts per IP per 15 minutes
-  standardHeaders: 'draft-7',
+  standardHeaders: true,
   legacyHeaders: false,
-  validate: false,
   message: { error: 'Too many login attempts from this IP. Try again in 15 minutes.' }
 });
 
-// app.use('/api/', globalLimiter);
-// app.use('/api/auth/login', loginLimiter);
+app.use('/api/', globalLimiter);
+app.use('/api/auth/login', loginLimiter);
+
 
 
 
