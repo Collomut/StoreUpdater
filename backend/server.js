@@ -270,20 +270,25 @@ app.get('/', (req, res) => {
   res.json({ status: 'Stock Manager API Backend is running.' });
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.message);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
+
 // ─── Start Server then run DB init in background ─────────────────────────────
-// Start HTTP listener first so Render's health check on the port passes
-// immediately, even if the database takes a moment to warm up.
-app.listen(PORT, () => {
-  console.log(`Stock Manager API Backend listening on port ${PORT}`);
+// Explicitly bind to 0.0.0.0 so Render's healthcheck proxy can connect
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Stock Manager API Backend listening on 0.0.0.0:${PORT}`);
 });
 
 // Run schema migration and seeding in background — non-fatal if it fails
 initializeDatabase().catch(err => {
   console.error('Non-fatal: Database initialization error on startup:', err.message);
 });
+
