@@ -58,8 +58,9 @@ const loginLimiter = rateLimit({
   message: { error: 'Too many login attempts from this IP. Try again in 15 minutes.' }
 });
 
-app.use('/api/', globalLimiter);
-app.use('/api/auth/login', loginLimiter);
+// app.use('/api/', globalLimiter);
+// app.use('/api/auth/login', loginLimiter);
+
 
 
 // ─── JWT Authentication Middleware ───────────────────────────────────────────
