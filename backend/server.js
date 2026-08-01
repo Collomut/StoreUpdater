@@ -39,11 +39,14 @@ app.use(cors({ origin: false }));
 
 app.use(express.json({ limit: '1mb' }));
 
+// Trust Render's reverse proxy (needed for correct IP detection in rate limiter)
+app.set('trust proxy', 1);
+
 // ─── H-1: Global and per-route rate limiting ─────────────────────────────────
 const globalLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,    // 1 minute window
   max: 300,                    // max 300 requests per IP per minute
-  standardHeaders: true,
+  standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many requests. Please slow down.' }
 });
@@ -51,7 +54,7 @@ const globalLimiter = rateLimit({
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,   // 15 minute window
   max: 20,                     // max 20 login attempts per IP per 15 minutes
-  standardHeaders: true,
+  standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many login attempts from this IP. Try again in 15 minutes.' }
 });
