@@ -7,11 +7,16 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.*;
-import java.net.*;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.*;
+import java.time.Duration;
 import java.util.Properties;
-import java.util.regex.*;
 
 /**
  * Checks GitHub for a newer version of the app on startup.
@@ -172,14 +177,21 @@ public class AutoUpdater {
             @Override
             protected Path call() throws Exception {
                 Path tmp = Files.createTempFile("StockManager-update-", suffix);
-                URL url = new URL(downloadUrl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(10_000);
-                conn.setReadTimeout(120_000);
-                conn.setInstanceFollowRedirects(true);
-                long total = conn.getContentLengthLong();
 
-                try (InputStream in  = conn.getInputStream();
+                HttpRequest dlRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(downloadUrl))
+                    .timeout(Duration.ofSeconds(120))
+                    .header("User-Agent", "StockManager-Updater/1.0")
+                    .GET()
+                    .build();
+
+                // Stream response body to temp file with progress tracking
+                HttpResponse<InputStream> dlResponse = HTTP_CLIENT.send(
+                    dlRequest, HttpResponse.BodyHandlers.ofInputStream());
+
+                long total = dlResponse.headers().firstValueAsLong("Content-Length").orElse(-1L);
+
+                try (InputStream in  = dlResponse.body();
                      OutputStream out = Files.newOutputStream(tmp)) {
                     byte[] buf = new byte[8192];
                     long downloaded = 0;
@@ -194,6 +206,7 @@ public class AutoUpdater {
                 return tmp;
             }
         };
+
 
         bar.progressProperty().bind(downloadTask.progressProperty());
         statusLbl.textProperty().bind(downloadTask.messageProperty());
@@ -393,28 +406,33 @@ public class AutoUpdater {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    // L-2: Use modern java.net.http.HttpClient instead of deprecated URL/HttpURLConnection
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(10))
+        .followRedirects(HttpClient.Redirect.NORMAL)
+        .build();
+
     public static String fetchUrl(String urlStr, int timeoutMs) throws Exception {
-        URL url = new URL(urlStr);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setConnectTimeout(timeoutMs);
-        conn.setReadTimeout(timeoutMs);
-        conn.setRequestProperty("User-Agent", "StockManager-Updater/1.0");
-        if (conn.getResponseCode() != 200) return null;
-        try (BufferedReader r = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()))) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = r.readLine()) != null) sb.append(line);
-            return sb.toString();
-        }
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(urlStr))
+            .timeout(Duration.ofMillis(timeoutMs))
+            .header("User-Agent", "StockManager-Updater/1.0")
+            .GET()
+            .build();
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) return null;
+        return response.body();
     }
 
-    /** Extracts a string value from a simple flat JSON object. */
+    // L-3: Use Gson to parse JSON fields — robust against escaped chars and Unicode
     public static String extractField(String json, String field) {
-        Matcher m = Pattern.compile(
-            "\"" + Pattern.quote(field) + "\"\\s*:\\s*\"([^\"]+)\"")
-            .matcher(json);
-        return m.find() ? m.group(1) : null;
+        try {
+            JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
+            if (obj.has(field) && !obj.get(field).isJsonNull()) {
+                return obj.get(field).getAsString();
+            }
+        } catch (Exception ignored) {}
+        return null;
     }
 
     /**

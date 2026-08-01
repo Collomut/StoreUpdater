@@ -32,7 +32,10 @@ public class MainController {
     @FXML private Label lblCurrentUser;
 
     private ToggleGroup navGroup;
-    private int currentShopId = 1;
+    private int    currentShopId   = 1;
+    private String currentShopName = "";
+    // M-4: cache shops locally so controllers don't make extra getAllShops() HTTP calls
+    private List<Shop> cachedShops = List.of();
 
     private DashboardController dashboardController;
     private InventoryController inventoryController;
@@ -72,8 +75,9 @@ public class MainController {
         shopComboBox.setOnAction(e -> {
             Shop selected = shopComboBox.getValue();
             if (selected != null) {
-                currentShopId = selected.getId();
-                shopNameLabel.setText(selected.getName());
+                currentShopId   = selected.getId();
+                currentShopName = selected.getName();
+                shopNameLabel.setText(currentShopName);
                 refreshCurrentPane();
             }
         });
@@ -105,14 +109,16 @@ public class MainController {
     }
 
     private void loadShops() {
-        List<Shop> shops = DatabaseManager.getInstance().getAllShops();
+        cachedShops = DatabaseManager.getInstance().getAllShops(); // M-4: populate cache
+        List<Shop> shops = cachedShops;
         if (Session.isAdmin()) {
             // Admin sees all shops
             shopComboBox.getItems().setAll(shops);
             if (!shops.isEmpty()) {
                 shopComboBox.setValue(shops.get(0));
-                currentShopId = shops.get(0).getId();
-                shopNameLabel.setText(shops.get(0).getName());
+                currentShopId   = shops.get(0).getId();
+                currentShopName = shops.get(0).getName();
+                shopNameLabel.setText(currentShopName);
             }
         } else {
             // Worker is locked to their shop
@@ -121,8 +127,9 @@ public class MainController {
                 .filter(s -> s.getId() == lockedId)
                 .findFirst()
                 .ifPresent(s -> {
-                    currentShopId = s.getId();
-                    shopNameLabel.setText(s.getName());
+                    currentShopId   = s.getId();
+                    currentShopName = s.getName();
+                    shopNameLabel.setText(currentShopName);
                 });
         }
     }
@@ -180,11 +187,12 @@ public class MainController {
     public void refreshCurrentPane() {
         if (contentArea.getChildren().isEmpty()) return;
         Parent current = (Parent) contentArea.getChildren().get(0);
-        lastRefreshedAt.put(current, System.currentTimeMillis()); // record timestamp
+        lastRefreshedAt.put(current, System.currentTimeMillis());
         if (current == dashboardPane && dashboardController != null)
             dashboardController.refresh(currentShopId);
         else if (current == inventoryPane && inventoryController != null)
-            inventoryController.refresh(currentShopId);
+            // M-4: pass cached shop name to avoid extra getAllShops() HTTP call per refresh
+            inventoryController.refresh(currentShopId, currentShopName);
         else if (current == salesPane && salesController != null)
             salesController.refresh(currentShopId);
         else if (current == historyPane && historyController != null)

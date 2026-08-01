@@ -1,0 +1,41 @@
+name: Weekly Database Backup
+
+on:
+  schedule:
+    # Every Sunday at 02:00 UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Manual backup reason'
+        required: false
+        default: 'Manual trigger'
+
+jobs:
+  backup:
+    name: Export Database Snapshot
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pg client
+        run: npm install pg
+
+      - name: Run database export
+        env:
+          DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+        run: node .github/scripts/export_backup.js
+
+      - name: Upload backup as artifact (retained 90 days)
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_number }}-${{ github.run_attempt }}
+          path: backup.json
+          retention-days: 90

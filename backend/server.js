@@ -1,14 +1,24 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+// ─── C-1: Crash loudly if JWT_SECRET is missing (never use a fallback) ────────
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET environment variable is not set. Refusing to start.');
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_jwt_tokens_12345';
 
-// Database Connection Pool
+// ─── Database Connection Pool ────────────────────────────────────────────────
+// Note: rejectUnauthorized is false due to Supabase PgBouncer pooler (port 6543)
+// presenting a hostname mismatch. Connection is still TLS-encrypted end-to-end.
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -18,12 +28,39 @@ const pool = new Pool({
 
 // Expose pool to routes
 app.set('dbPool', pool);
+app.set('jwtSecret', JWT_SECRET);
 
-app.use(cors());
-app.use(express.json());
+// ─── L-5: Security headers via helmet ────────────────────────────────────────
+app.use(helmet());
+
+// ─── C-2: Restrictive CORS — desktop client only, no browser cross-origin ─────
+// The app is a desktop JavaFX client. No browser needs cross-origin access.
+app.use(cors({ origin: false }));
+
+app.use(express.json({ limit: '1mb' }));
+
+// ─── H-1: Global and per-route rate limiting ─────────────────────────────────
+const globalLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,    // 1 minute window
+  max: 300,                    // max 300 requests per IP per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please slow down.' }
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,   // 15 minute window
+  max: 20,                     // max 20 login attempts per IP per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts from this IP. Try again in 15 minutes.' }
+});
+
+app.use('/api/', globalLimiter);
+app.use('/api/auth/login', loginLimiter);
 
 // ─── JWT Authentication Middleware ───────────────────────────────────────────
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -31,22 +68,56 @@ function authenticateToken(req, res, next) {
     return res.status(401).json({ error: 'Access token missing' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Access token invalid or expired' });
+  let decoded;
+  try {
+    decoded = jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    return res.status(403).json({ error: 'Access token invalid or expired' });
+  }
+
+  // ─── H-5: Validate token_version to support logout/revocation ──────────────
+  try {
+    const result = await pool.query(
+      'SELECT token_version FROM users WHERE id = $1',
+      [decoded.userId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(403).json({ error: 'User no longer exists' });
     }
-    req.user = user; // Contains: { userId, username, role, shopId }
-    next();
-  });
+    if (result.rows[0].token_version !== decoded.tokenVersion) {
+      return res.status(403).json({ error: 'Session has been revoked. Please log in again.' });
+    }
+  } catch (err) {
+    console.error('Token version check error:', err.message);
+    return res.status(500).json({ error: 'Authentication error' });
+  }
+
+  req.user = decoded; // Contains: { userId, username, role, shopId, tokenVersion }
+  next();
 }
+
+// ─── Helper: write to audit log (non-blocking, fire and forget) ───────────────
+async function auditLog(pool, userId, action, detail) {
+  try {
+    await pool.query(
+      'INSERT INTO audit_log (user_id, action, detail) VALUES ($1, $2, $3)',
+      [userId || null, action, detail || null]
+    );
+  } catch (err) {
+    // Never let audit log failures break main operations
+    console.error('Audit log write failed:', err.message);
+  }
+}
+
+app.set('auditLog', auditLog);
 
 // ─── Schema Auto-Initialization (Run on Startup) ─────────────────────────────
 async function initializeDatabase() {
   const client = await pool.connect();
   try {
     console.log('Initializing database schema if absent...');
-    
-    // Create shops table
+
+    // Core tables
     await client.query(`
       CREATE TABLE IF NOT EXISTS shops (
         id SERIAL PRIMARY KEY,
@@ -55,7 +126,6 @@ async function initializeDatabase() {
       )
     `);
 
-    // Create products table
     await client.query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
@@ -71,7 +141,6 @@ async function initializeDatabase() {
       )
     `);
 
-    // Create sales table
     await client.query(`
       CREATE TABLE IF NOT EXISTS sales (
         id SERIAL PRIMARY KEY,
@@ -82,7 +151,6 @@ async function initializeDatabase() {
       )
     `);
 
-    // Create sale_items table
     await client.query(`
       CREATE TABLE IF NOT EXISTS sale_items (
         id SERIAL PRIMARY KEY,
@@ -93,7 +161,6 @@ async function initializeDatabase() {
       )
     `);
 
-    // Create settings table
     await client.query(`
       CREATE TABLE IF NOT EXISTS settings (
         key VARCHAR(100) PRIMARY KEY,
@@ -101,7 +168,6 @@ async function initializeDatabase() {
       )
     `);
 
-    // Create users table
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -111,23 +177,32 @@ async function initializeDatabase() {
         shop_id INTEGER REFERENCES shops(id),
         must_change_password BOOLEAN NOT NULL DEFAULT FALSE,
         failed_attempts INTEGER NOT NULL DEFAULT 0,
-        locked_until TIMESTAMP
+        locked_until TIMESTAMP,
+        token_version INTEGER NOT NULL DEFAULT 0
       )
     `);
 
-    // Run schema column migrations
-    try {
-      await client.query('ALTER TABLE products ALTER COLUMN cost_price TYPE NUMERIC(12,2)');
-      await client.query('ALTER TABLE products ALTER COLUMN selling_price TYPE NUMERIC(12,2)');
-      await client.query('ALTER TABLE sales ALTER COLUMN total_amount TYPE NUMERIC(12,2)');
-      await client.query('ALTER TABLE sale_items ALTER COLUMN unit_price TYPE NUMERIC(12,2)');
-    } catch (ignored) {}
+    // ─── F-1: Audit log table ────────────────────────────────────────────────
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS audit_log (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        action VARCHAR(100) NOT NULL,
+        detail TEXT,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
 
-    try {
-      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN NOT NULL DEFAULT FALSE');
-      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_attempts INTEGER NOT NULL DEFAULT 0');
-      await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP');
-    } catch (ignored) {}
+    // Schema column migrations (idempotent)
+    try { await client.query('ALTER TABLE products ALTER COLUMN cost_price TYPE NUMERIC(12,2)'); } catch (_) {}
+    try { await client.query('ALTER TABLE products ALTER COLUMN selling_price TYPE NUMERIC(12,2)'); } catch (_) {}
+    try { await client.query('ALTER TABLE sales ALTER COLUMN total_amount TYPE NUMERIC(12,2)'); } catch (_) {}
+    try { await client.query('ALTER TABLE sale_items ALTER COLUMN unit_price TYPE NUMERIC(12,2)'); } catch (_) {}
+    try { await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN NOT NULL DEFAULT FALSE'); } catch (_) {}
+    try { await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_attempts INTEGER NOT NULL DEFAULT 0'); } catch (_) {}
+    try { await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP'); } catch (_) {}
+    // H-5: token_version column for JWT revocation
+    try { await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0'); } catch (_) {}
 
     // Seed default data if empty
     const shopsRes = await client.query('SELECT COUNT(*) FROM shops');
@@ -154,13 +229,13 @@ async function initializeDatabase() {
       const shops = await client.query('SELECT id FROM shops ORDER BY id');
       const ids = shops.rows.map(r => r.id);
 
-      await client.query('INSERT INTO users (username, password_hash, role, shop_id, must_change_password) VALUES ($1, $2, $3, $4, $5)', 
+      await client.query('INSERT INTO users (username, password_hash, role, shop_id, must_change_password) VALUES ($1, $2, $3, $4, $5)',
         ['admin', adminHash, 'ADMIN', null, true]);
-      if (ids[0]) await client.query('INSERT INTO users (username, password_hash, role, shop_id, must_change_password) VALUES ($1, $2, $3, $4, $5)', 
+      if (ids[0]) await client.query('INSERT INTO users (username, password_hash, role, shop_id, must_change_password) VALUES ($1, $2, $3, $4, $5)',
         ['shop1', shop1Hash, 'WORKER', ids[0], true]);
-      if (ids[1]) await client.query('INSERT INTO users (username, password_hash, role, shop_id, must_change_password) VALUES ($1, $2, $3, $4, $5)', 
+      if (ids[1]) await client.query('INSERT INTO users (username, password_hash, role, shop_id, must_change_password) VALUES ($1, $2, $3, $4, $5)',
         ['shop2', shop2Hash, 'WORKER', ids[1], true]);
-      if (ids[2]) await client.query('INSERT INTO users (username, password_hash, role, shop_id, must_change_password) VALUES ($1, $2, $3, $4, $5)', 
+      if (ids[2]) await client.query('INSERT INTO users (username, password_hash, role, shop_id, must_change_password) VALUES ($1, $2, $3, $4, $5)',
         ['shop3', shop3Hash, 'WORKER', ids[2], true]);
     }
 
@@ -173,26 +248,27 @@ async function initializeDatabase() {
 }
 
 // ─── Routing ─────────────────────────────────────────────────────────────────
-const authRouter = require('./routes/auth');
+const authRouter     = require('./routes/auth');
 const productsRouter = require('./routes/products');
-const salesRouter = require('./routes/sales');
-const shopsRouter = require('./routes/shops');
+const salesRouter    = require('./routes/sales');
+const shopsRouter    = require('./routes/shops');
 const settingsRouter = require('./routes/settings');
-const usersRouter = require('./routes/users');
+const usersRouter    = require('./routes/users');
 
-app.use('/api/auth', authRouter);
+app.use('/api/auth',     authRouter);
 app.use('/api/products', authenticateToken, productsRouter);
-app.use('/api/sales', authenticateToken, salesRouter);
-app.use('/api/shops', authenticateToken, shopsRouter);
+app.use('/api/sales',    authenticateToken, salesRouter);
+app.use('/api/shops',    authenticateToken, shopsRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
-app.use('/api/users', authenticateToken, usersRouter);
+app.use('/api/users',    authenticateToken, usersRouter);
+
 app.get('/', (req, res) => {
   res.json({ status: 'Stock Manager API Backend is running.' });
 });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Unhandled error:', err.message);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 

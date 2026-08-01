@@ -86,15 +86,12 @@ public class InventoryController {
         if (btnDelete != null) { btnDelete.setVisible(isAdmin); btnDelete.setManaged(isAdmin); }
     }
 
-    public void refresh(int shopId) {
+    // M-4: shopName is now passed from MainController's cached shop list
+    // to avoid making an extra getAllShops() HTTP call on every tab switch/auto-refresh.
+    public void refresh(int shopId, String shopName) {
         this.shopId = shopId;
-        // Detect Nyabugogo once per shop selection (cached — no extra DB call)
-        String shopName = DatabaseManager.getInstance().getAllShops().stream()
-            .filter(s -> s.getId() == shopId)
-            .map(com.stockmanager.model.Shop::getName)
-            .findFirst().orElse("");
-        isNyabugogo = shopName.toLowerCase().contains("nyabugogo");
-        applyColumnModes();   // rename/reconfigure columns based on shop type
+        isNyabugogo = shopName != null && shopName.toLowerCase().contains("nyabugogo");
+        applyColumnModes();
         loadProductsAsync();
     }
 

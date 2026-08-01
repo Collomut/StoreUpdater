@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
     );
     return res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Fetch products error:', err.message);
     return res.status(500).json({ error: 'Database error fetching products' });
   }
 });
@@ -39,7 +39,7 @@ router.get('/has-sales/:id', async (req, res) => {
     );
     return res.json({ hasSales: result.rows[0].count > 0 });
   } catch (err) {
-    console.error(err);
+    console.error('Check product sales error:', err.message);
     return res.status(500).json({ error: 'Database error checking product sales' });
   }
 });
@@ -51,16 +51,35 @@ router.post('/', async (req, res) => {
   }
 
   const { shopId, name, category, sku, unit, quantity, reorderLevel, costPrice, sellingPrice } = req.body;
-  const pool = req.app.get('dbPool');
+  const pool     = req.app.get('dbPool');
+  const auditLog = req.app.get('auditLog');
+
+  // M-5: Input validation
+  if (!name || name.trim().length === 0) {
+    return res.status(400).json({ error: 'Product name is required' });
+  }
+  if (!shopId) {
+    return res.status(400).json({ error: 'shopId is required' });
+  }
+  if (quantity !== undefined && quantity < 0) {
+    return res.status(400).json({ error: 'Quantity cannot be negative' });
+  }
+  if (sellingPrice !== undefined && sellingPrice < 0) {
+    return res.status(400).json({ error: 'Selling price cannot be negative' });
+  }
+  if (costPrice !== undefined && costPrice < 0) {
+    return res.status(400).json({ error: 'Cost price cannot be negative' });
+  }
 
   try {
     await pool.query(
       'INSERT INTO products (shop_id, name, category, sku, unit, quantity, reorder_level, cost_price, selling_price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-      [shopId, name, category, sku, unit, quantity || 0, reorderLevel || 5, costPrice || 0, sellingPrice || 0]
+      [shopId, name.trim(), category || null, sku || null, unit || null, quantity || 0, reorderLevel || 5, costPrice || 0, sellingPrice || 0]
     );
+    await auditLog(pool, req.user.userId, 'PRODUCT_CREATED', `Product "${name}" added to shop ${shopId}`);
     return res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error('Add product error:', err.message);
     return res.status(500).json({ error: 'Database error adding product' });
   }
 });
@@ -73,16 +92,32 @@ router.put('/:id', async (req, res) => {
 
   const productId = parseInt(req.params.id);
   const { name, category, sku, unit, quantity, reorderLevel, costPrice, sellingPrice } = req.body;
-  const pool = req.app.get('dbPool');
+  const pool     = req.app.get('dbPool');
+  const auditLog = req.app.get('auditLog');
+
+  // M-5: Input validation
+  if (!name || name.trim().length === 0) {
+    return res.status(400).json({ error: 'Product name is required' });
+  }
+  if (quantity !== undefined && quantity < 0) {
+    return res.status(400).json({ error: 'Quantity cannot be negative' });
+  }
+  if (sellingPrice !== undefined && sellingPrice < 0) {
+    return res.status(400).json({ error: 'Selling price cannot be negative' });
+  }
+  if (costPrice !== undefined && costPrice < 0) {
+    return res.status(400).json({ error: 'Cost price cannot be negative' });
+  }
 
   try {
     const result = await pool.query(
       'UPDATE products SET name = $1, category = $2, sku = $3, unit = $4, quantity = $5, reorder_level = $6, cost_price = $7, selling_price = $8 WHERE id = $9',
-      [name, category, sku, unit, quantity, reorderLevel, costPrice, sellingPrice, productId]
+      [name.trim(), category || null, sku || null, unit || null, quantity, reorderLevel, costPrice, sellingPrice, productId]
     );
+    await auditLog(pool, req.user.userId, 'PRODUCT_UPDATED', `Product ID ${productId} ("${name}") updated`);
     return res.json({ success: result.rowCount > 0 });
   } catch (err) {
-    console.error(err);
+    console.error('Update product error:', err.message);
     return res.status(500).json({ error: 'Database error updating product' });
   }
 });
@@ -94,16 +129,18 @@ router.post('/:id/retire', async (req, res) => {
   }
 
   const productId = parseInt(req.params.id);
-  const pool = req.app.get('dbPool');
+  const pool      = req.app.get('dbPool');
+  const auditLog  = req.app.get('auditLog');
 
   try {
     const result = await pool.query(
       'UPDATE products SET quantity = 0, reorder_level = -1 WHERE id = $1',
       [productId]
     );
+    await auditLog(pool, req.user.userId, 'PRODUCT_RETIRED', `Product ID ${productId} retired`);
     return res.json({ success: result.rowCount > 0 });
   } catch (err) {
-    console.error(err);
+    console.error('Retire product error:', err.message);
     return res.status(500).json({ error: 'Database error retiring product' });
   }
 });
@@ -115,16 +152,18 @@ router.delete('/:id', async (req, res) => {
   }
 
   const productId = parseInt(req.params.id);
-  const pool = req.app.get('dbPool');
+  const pool      = req.app.get('dbPool');
+  const auditLog  = req.app.get('auditLog');
 
   try {
     const result = await pool.query(
       'DELETE FROM products WHERE id = $1',
       [productId]
     );
+    await auditLog(pool, req.user.userId, 'PRODUCT_DELETED', `Product ID ${productId} permanently deleted`);
     return res.json({ success: result.rowCount > 0 });
   } catch (err) {
-    console.error(err);
+    console.error('Delete product error:', err.message);
     return res.status(500).json({ error: 'Database error deleting product' });
   }
 });

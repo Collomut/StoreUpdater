@@ -4,9 +4,10 @@ const router = express.Router();
 // POST /api/sales — Record a transaction (uses database transaction)
 router.post('/', async (req, res) => {
   const { shopId, saleDate, totalAmount, items } = req.body;
-  const pool = req.app.get('dbPool');
+  const pool     = req.app.get('dbPool');
+  const auditLog = req.app.get('auditLog');
 
-  if (!shopId || !saleDate || !totalAmount || !items || !Array.isArray(items)) {
+  if (!shopId || !saleDate || !totalAmount || !items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: 'Invalid sale transaction payload' });
   }
 
@@ -17,47 +18,71 @@ router.post('/', async (req, res) => {
 
   const client = await pool.connect();
   try {
-    await client.query('BEGIN'); // Start Transaction
+    await client.query('BEGIN');
 
-    // Increment receipt counter setting
+    // Increment receipt counter (locked for this transaction)
     const counterRes = await client.query("SELECT value FROM settings WHERE key = 'receipt_counter' FOR UPDATE");
     let counter = 1;
     if (counterRes.rows.length > 0) {
-      counter = parseInt(counterRes.rows[0].value);
+      const parsed = parseInt(counterRes.rows[0].value);
+      // L-4: Guard against corrupted counter value
+      counter = isNaN(parsed) ? 1 : parsed;
     }
-    
     const nextCounter = counter + 1;
-    await client.query("INSERT INTO settings (key, value) VALUES ('receipt_counter', $1) ON CONFLICT (key) DO UPDATE SET value = $1", [String(nextCounter)]);
+    await client.query(
+      "INSERT INTO settings (key, value) VALUES ('receipt_counter', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
+      [String(nextCounter)]
+    );
 
-    // Generate formatted receipt number
     const receiptNo = `RCP-${String(counter).padStart(4, '0')}`;
 
-    // Insert sale
+    // Insert sale header
     const saleInsertRes = await client.query(
       'INSERT INTO sales (shop_id, sale_date, total_amount, receipt_number) VALUES ($1, $2, $3, $4) RETURNING id',
       [shopId, saleDate, totalAmount, receiptNo]
     );
     const saleId = saleInsertRes.rows[0].id;
 
-    // Insert sale items and deduct inventory quantities
+    // Insert sale items, verifying stock and shop ownership per item
     for (const item of items) {
+      // H-4: Verify each product belongs to this shop
+      const productRes = await client.query(
+        'SELECT shop_id, quantity FROM products WHERE id = $1',
+        [item.productId]
+      );
+      if (productRes.rows.length === 0) {
+        throw new Error(`Product ID ${item.productId} not found`);
+      }
+      if (productRes.rows[0].shop_id !== parseInt(shopId)) {
+        throw new Error(`Product ID ${item.productId} does not belong to shop ${shopId}`);
+      }
+
+      // H-3: Verify sufficient stock before deducting
+      const deductRes = await client.query(
+        'UPDATE products SET quantity = quantity - $1 WHERE id = $2 AND quantity >= $1 RETURNING id',
+        [item.quantitySold, item.productId]
+      );
+      if (deductRes.rowCount === 0) {
+        throw new Error(`Insufficient stock for product ID ${item.productId}`);
+      }
+
       await client.query(
         'INSERT INTO sale_items (sale_id, product_id, quantity_sold, unit_price) VALUES ($1, $2, $3, $4)',
         [saleId, item.productId, item.quantitySold, item.unitPrice]
       );
-
-      await client.query(
-        'UPDATE products SET quantity = quantity - $1 WHERE id = $2',
-        [item.quantitySold, item.productId]
-      );
     }
 
-    await client.query('COMMIT'); // Commit Transaction
+    await client.query('COMMIT');
+
+    // F-1: Audit the sale
+    await auditLog(pool, req.user.userId, 'SALE_RECORDED',
+      `Receipt ${receiptNo} — ${items.length} item(s), total ${totalAmount} — shop ${shopId}`);
+
     return res.json({ saleId, receiptNumber: receiptNo });
   } catch (err) {
-    await client.query('ROLLBACK'); // Rollback Transaction on error
-    console.error('Error during sales transaction:', err);
-    return res.status(500).json({ error: 'Transaction failed, database rolled back.' });
+    await client.query('ROLLBACK');
+    console.error('Sales transaction error:', err.message);
+    return res.status(400).json({ error: err.message || 'Transaction failed, database rolled back.' });
   } finally {
     client.release();
   }
@@ -84,24 +109,37 @@ router.get('/', async (req, res) => {
     );
     return res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Fetch sales error:', err.message);
     return res.status(500).json({ error: 'Database error fetching sales list' });
   }
 });
 
-// GET /api/sales/items/:saleId — fetch items of a sale
+// GET /api/sales/items/:saleId — fetch items of a specific sale
 router.get('/items/:saleId', async (req, res) => {
   const saleId = parseInt(req.params.saleId);
-  const pool = req.app.get('dbPool');
+  const pool   = req.app.get('dbPool');
 
   try {
+    // M-2: Verify the sale belongs to this user's shop (workers cannot peek at other shops' sales)
+    const saleRes = await pool.query('SELECT shop_id FROM sales WHERE id = $1', [saleId]);
+    if (saleRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Sale not found' });
+    }
+    if (req.user.role === 'WORKER' && saleRes.rows[0].shop_id !== req.user.shopId) {
+      return res.status(403).json({ error: 'Access denied: This sale does not belong to your shop' });
+    }
+
     const result = await pool.query(
-      'SELECT si.id, si.sale_id, si.product_id, si.quantity_sold, si.unit_price::float8, p.name as product_name FROM sale_items si JOIN products p ON si.product_id = p.id WHERE si.sale_id = $1',
+      `SELECT si.id, si.sale_id, si.product_id, si.quantity_sold, si.unit_price::float8,
+              p.name AS product_name
+       FROM sale_items si
+       JOIN products p ON si.product_id = p.id
+       WHERE si.sale_id = $1`,
       [saleId]
     );
     return res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Fetch sale items error:', err.message);
     return res.status(500).json({ error: 'Database error fetching sale items' });
   }
 });
@@ -122,20 +160,20 @@ router.get('/flat-rows', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT s.sale_date::text, s.receipt_number, s.total_amount::float8, 
-              p.name AS product_name, p.category AS product_category, p.unit AS product_unit, 
-              si.quantity_sold, si.unit_price::float8, sh.name as shop_name 
-       FROM sale_items si 
-       JOIN sales s ON si.sale_id = s.id 
-       JOIN products p ON si.product_id = p.id 
-       JOIN shops sh ON s.shop_id = sh.id 
-       WHERE s.shop_id = $1 AND s.sale_date BETWEEN $2 AND $3 
+      `SELECT s.sale_date::text, s.receipt_number, s.total_amount::float8,
+              p.name AS product_name, p.category AS product_category, p.unit AS product_unit,
+              si.quantity_sold, si.unit_price::float8, sh.name AS shop_name
+       FROM sale_items si
+       JOIN sales s    ON si.sale_id    = s.id
+       JOIN products p ON si.product_id = p.id
+       JOIN shops sh   ON s.shop_id     = sh.id
+       WHERE s.shop_id = $1 AND s.sale_date BETWEEN $2 AND $3
        ORDER BY s.sale_date DESC, s.id DESC`,
       [shopId, from, to]
     );
     return res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Fetch flat-rows error:', err.message);
     return res.status(500).json({ error: 'Database error fetching flat sales' });
   }
 });
@@ -155,34 +193,34 @@ router.get('/dashboard-stats', async (req, res) => {
 
   try {
     const sRes = await pool.query(
-      `SELECT 
+      `SELECT
          COALESCE(SUM(CASE WHEN sale_date = CURRENT_DATE THEN total_amount END), 0)::float8              AS today_sales,
          COALESCE(SUM(CASE WHEN sale_date >= date_trunc('week',  CURRENT_DATE) THEN total_amount END), 0)::float8 AS week_sales,
-         COALESCE(SUM(CASE WHEN sale_date >= date_trunc('month', CURRENT_DATE) THEN total_amount END), 0)::float8 AS month_sales 
+         COALESCE(SUM(CASE WHEN sale_date >= date_trunc('month', CURRENT_DATE) THEN total_amount END), 0)::float8 AS month_sales
        FROM sales WHERE shop_id = $1`,
       [shopId]
     );
 
     const pRes = await pool.query(
-      `SELECT 
-         COALESCE(SUM(quantity * selling_price), 0)::float8               AS stock_value,
-         COUNT(CASE WHEN quantity < 5 THEN 1 END)::int                     AS low_count 
+      `SELECT
+         COALESCE(SUM(quantity * selling_price), 0)::float8 AS stock_value,
+         COUNT(CASE WHEN quantity < 5 THEN 1 END)::int       AS low_count
        FROM products WHERE shop_id = $1`,
       [shopId]
     );
 
-    const stats = sRes.rows[0];
+    const stats    = sRes.rows[0];
     const products = pRes.rows[0];
 
     return res.json([
-      stats.today_sales || 0.0,
-      stats.week_sales || 0.0,
-      stats.month_sales || 0.0,
+      stats.today_sales  || 0.0,
+      stats.week_sales   || 0.0,
+      stats.month_sales  || 0.0,
       products.stock_value || 0.0,
       parseFloat(products.low_count || 0)
     ]);
   } catch (err) {
-    console.error(err);
+    console.error('Dashboard stats error:', err.message);
     return res.status(500).json({ error: 'Database error calculating dashboard stats' });
   }
 });
@@ -201,14 +239,14 @@ router.get('/overview-stats', async (req, res) => {
               COALESCE(SUM(CASE WHEN s.sale_date >= date_trunc('month', CURRENT_DATE) THEN s.total_amount END), 0)::float8 AS month_sales,
               COALESCE((SELECT SUM(p.quantity * p.selling_price) FROM products p WHERE p.shop_id = sh.id), 0)::float8 AS stock_value,
               COALESCE((SELECT COUNT(*) FROM products p WHERE p.shop_id = sh.id AND p.quantity < 5), 0)::int    AS low_stock,
-              COALESCE((SELECT COUNT(*) FROM products p WHERE p.shop_id = sh.id), 0)::int                       AS total_products 
-       FROM shops sh 
-       LEFT JOIN sales s ON s.shop_id = sh.id 
+              COALESCE((SELECT COUNT(*) FROM products p WHERE p.shop_id = sh.id), 0)::int                       AS total_products
+       FROM shops sh
+       LEFT JOIN sales s ON s.shop_id = sh.id
        GROUP BY sh.id, sh.name ORDER BY sh.id`
     );
     return res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Overview stats error:', err.message);
     return res.status(500).json({ error: 'Database error calculating global overview stats' });
   }
 });
@@ -227,20 +265,21 @@ router.get('/top-products', async (req, res) => {
     return res.status(400).json({ error: 'shopId, from, and to parameters are required' });
   }
 
-  const queryLimit = limit ? parseInt(limit) : 5;
+  const queryLimit = Math.min(parseInt(limit) || 5, 50); // cap at 50 to prevent abuse
 
   try {
     const result = await pool.query(
-      `SELECT p.name as product_name, SUM(si.quantity_sold * si.unit_price)::float8 as revenue 
-       FROM sale_items si JOIN products p ON si.product_id = p.id 
-       JOIN sales s ON si.sale_id = s.id 
-       WHERE s.shop_id = $1 AND s.sale_date BETWEEN $2 AND $3 
+      `SELECT p.name AS product_name, SUM(si.quantity_sold * si.unit_price)::float8 AS revenue
+       FROM sale_items si
+       JOIN products p ON si.product_id = p.id
+       JOIN sales s    ON si.sale_id    = s.id
+       WHERE s.shop_id = $1 AND s.sale_date BETWEEN $2 AND $3
        GROUP BY p.name ORDER BY revenue DESC LIMIT $4`,
       [shopId, from, to, queryLimit]
     );
     return res.json(result.rows.map(r => [r.product_name, r.revenue]));
   } catch (err) {
-    console.error(err);
+    console.error('Top products error:', err.message);
     return res.status(500).json({ error: 'Database error fetching top products' });
   }
 });
