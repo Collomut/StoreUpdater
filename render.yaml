@@ -2,7 +2,6 @@ services:
   - type: web
     name: stockmanager-api
     env: node
-    rootDir: backend
     buildCommand: npm install
     startCommand: npm start
     envVars:
