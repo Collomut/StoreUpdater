@@ -3,8 +3,8 @@ services:
     name: stockmanager-api
     env: node
     rootDir: backend
-    buildCommand: "cd backend && npm install"
-    startCommand: "cd backend && npm start"
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: DATABASE_URL
         sync: false
