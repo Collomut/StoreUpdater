@@ -1,9 +1,9 @@
 {
-  "version": "1.3.7",
+  "version": "1.3.8",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.7/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.7/StockManager-1.3.7-x86_64.AppImage",
-  "release_notes": "Fix: Preserve active search filter in inventory section across background auto-refreshes",
-  "signature": "hyGGlH0+H5VFh+kja46krWeBY5uA5KmvFxNpl502+czOjR9yuqvX+UNVh99S8C3YojJVyXisNqx06FSKfVdEwnS0J+e/ujhnWilPrU/bf7DpILoA0qgWfaaJsMai/8UZAI2jvoUAD5w7sJskLT2POgTEEUENH59Gg6HQyQEfSXbD6t9vUcXl/5IiKUY+0kieg2DmYBDND+V4XSxumRMJF3GwROcs/qqeveX4HMCFv1pnASo0prqBO08YK+M5OnKuT7gAwNq0+nwRFKkITNcDOL8h7bv5vdplaqrlngDP3DWnnKfl8kZB2jWM1DdZ2Zf9Af97nj3mF2rAgE2U5nbR2w==",
-  "signature_linux": "jtXhEcclVgnHSUEz8Kx6WL8UnrSyyyEJPW+UvLADtskhW5vZ3s6eYLOolNhQBsddhr11EwBVwuFQkNmIWPVBDpH52DPQnODHH+hIv0inFK99HtfSsY7VgL/vhxV0NgtsihHmpdIb+mlxUfRRvlRJIasSfODWavuaGC2oeD+ZGQ1C6JWS8lmkLYNLQUH6eqMhmqoq+Nu4cR5NFcVNGptChelWYn6OW2WYvIbQfW5TwR2cwwyVwuEwjfiH01ogK2bkWDsONN0vrSrfisHUon6A8fH8nC8SN9bWGUtK39wJ6o8vtxxv1wfPePPuNswI4uVNBkSJhpXOaAaV5Msi77xtyQ=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.8/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.8/StockManager-1.3.8-x86_64.AppImage",
+  "release_notes": "Fix: Resolve Add User failure in Settings admin panel and propagate API error messages",
+  "signature": "VPr1OCNuylRkJZBOoP86ITyM9t/V00/LeZkCCZlre8eTKU5F0o4zuHsVNKgWvE4jfawEC8NQNGc1Oj+3+8YLPX9PnQ8RiPsITnBGBZZP5EKC2+WSIW4OmQwsJ2VuP0IhgaDct2RdWSU2p1/h6lI7p8WJpZcBoaIiYuscG33cWHqTQdgs4QNbRwwiSMp+7p9153ZNc8rbjuMT6+skezS7CxpRNIvadQ/LlbuPfz6FmWT4YCoQcxuySRD0VbSdqD1X4gWQrwayXAO8dLzlagB566RFbLNd7r6PfD4zUtU1VvmQdZGpzMS0W0j/SOZrDSUFsnAwUf/u95bD5Ennkw6s2g==",
+  "signature_linux": "A70go02IWuMbbdoyDvno68Bdy+Jv0K86xjgOmSWiLfoSFuljvug0dA9lyJ67JC2ya++6IQem9f4R+d480SxIMeBVKXTe+mf8kDfBXCYvvBJtWtTnjPqmpSV68MedU1/Ft7OsbWQy+5BkMOPWO/8CpiDchqA35zMCgZbPoVGxD68KhOPzb22xsBZDQbpmb+VWeRAR3PgLnzgFfqxVx6HfVqYFZa+1YaIt9fgAt1Lei8UGiFFHyV8jLZzve8SNw6apkgY9sthNqQtQUsDaf7zyNAuQ12IYZ74Dp4uDevPvhksxst07NIm+bLfK8KdHU1kGbfsn99KXP0AvqajY09J1Vw=="
 }
