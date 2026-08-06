@@ -1,9 +1,9 @@
 {
-  "version": "1.3.5",
+  "version": "1.3.6",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.5/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.5/StockManager-1.3.5-x86_64.AppImage",
-  "release_notes": "Feature: Added Cash and Phone payment method tracking to sales and dashboard",
-  "signature": "WxpDo74N7GtCHbqqoFdWxB00Fh2JwNPpWO2rhL97XN+Xc8NMEu1UZK/p//Okd3vj5Y+e+HyejPx9aq88bK9xN2HWENPDCGDB4bqpTK5s3uRlTnsdqN0gLa6joQhkA8XiwfT8iA7wS22eZp/OwhmxXHroS0h9cjANbJWKqOho4UN5pKEvqQIwPj8AL5H1ycVssx2EQ0u6cbdpXOLwH0VGZqHjrzUP69/sqHvdJZzYSr13PYTyghuzhPZAihab7ttGDg4WAyRTDY1q0J3JgCloV1Wro16unAlDnsMJejau+B7cue5C/Jy8lU1IphnaHdcgoQDQEdDgGzo/g5y1OBB2iw==",
-  "signature_linux": "hbyS+i8SEsJsbQiVj21My3EnsmGosvlm2Yf+8O84mmhSEn1g1OB8JvRGwYi8QeS9SBdBIiDDvElsCpWJAOpIVxOm4hTRS+1PV1iFMnFILwQdGNp0WsurjBSusHn8wwLvz4dUs/qj3eOcIEPkR7sP6wZYBa7UJpttmvxjNlOetYYQpvfDXx57LWHUjd1ALS73wrW1cUOFydyCdirO1hdwcb0OqFkA/CZRSCfU/ogMK9sDgJIJRkWoY07vbv11KOVQ5/CWyqHf1aYcB0S0Aeveq1RK/Z2ptkhWg3Y+WzfcDfQ3xfmMHm6Wu9niBn8xxNdNZwQvyUwYd/zZbsZFX6V1tA=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.6/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.6/StockManager-1.3.6-x86_64.AppImage",
+  "release_notes": "Display full characteristics (color and size) in Restock Alerts for Nyabugogo shop",
+  "signature": "PO07wNoUk/euAz0dmn78MA4LtGH9D8gsXh3941GtkUtmerFX0te7QR0mFXsIrW/FVOCHBxVNeio9BkgjwrY/0iVxCu3wvPRjt55TOWrtK43bPslBHRQ/n0aUboe7+53u9XajmVhENR+gPNSwhlJMVkzjO8p5FhBG+Qsy7S1gpowTmkplO0+Kw65eiuEeiofhBPDCGfXQUswuvIgQZWUyMt961SrVSavDdFBK/xXo8Ibor9kkzicUebNpdpTKoUdHYcvfXGi5Q1f77URvB7z9KcVOYVlS0UyaY6uLtmx/rMrhwHQqsOdRY6ZXF6YDYkkQMWrMkATsjnfPxFOCzmVPLQ==",
+  "signature_linux": "T+QAL8GwHZxVU95Rtom8FpxAS8g4mm7hh87EaYBqG1kAxHYaOFydVR17egyNouaf1nz6f5OGHoySSawh6V68ru1LSX+ZJSULK/kkJ2DwDL0wbtKRVzhvR+padA0Le7UFoIEGmuB9CiTruA9TXYW88QtyFoPuk/TZpckIS8UDF/FE7omM0G7jfm98MtqbTwbzpxi3zixA2N8/drxOvSisME0IvWRopZHPjGBD/7pzJuSAi3AaFkx+XU3kYkHzJ79A2iQvsActJUjSFY7LIHTz3l+ya/FHcog7CZ7ZcVnOKtDuY9M7HhmcZLl1QmoN3SHhG/+tjfoGTxmL4apZbuLWOw=="
 }
