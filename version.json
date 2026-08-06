@@ -1,9 +1,9 @@
 {
-  "version": "1.3.6",
+  "version": "1.3.7",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.6/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.6/StockManager-1.3.6-x86_64.AppImage",
-  "release_notes": "Display full characteristics (color and size) in Restock Alerts for Nyabugogo shop",
-  "signature": "PO07wNoUk/euAz0dmn78MA4LtGH9D8gsXh3941GtkUtmerFX0te7QR0mFXsIrW/FVOCHBxVNeio9BkgjwrY/0iVxCu3wvPRjt55TOWrtK43bPslBHRQ/n0aUboe7+53u9XajmVhENR+gPNSwhlJMVkzjO8p5FhBG+Qsy7S1gpowTmkplO0+Kw65eiuEeiofhBPDCGfXQUswuvIgQZWUyMt961SrVSavDdFBK/xXo8Ibor9kkzicUebNpdpTKoUdHYcvfXGi5Q1f77URvB7z9KcVOYVlS0UyaY6uLtmx/rMrhwHQqsOdRY6ZXF6YDYkkQMWrMkATsjnfPxFOCzmVPLQ==",
-  "signature_linux": "T+QAL8GwHZxVU95Rtom8FpxAS8g4mm7hh87EaYBqG1kAxHYaOFydVR17egyNouaf1nz6f5OGHoySSawh6V68ru1LSX+ZJSULK/kkJ2DwDL0wbtKRVzhvR+padA0Le7UFoIEGmuB9CiTruA9TXYW88QtyFoPuk/TZpckIS8UDF/FE7omM0G7jfm98MtqbTwbzpxi3zixA2N8/drxOvSisME0IvWRopZHPjGBD/7pzJuSAi3AaFkx+XU3kYkHzJ79A2iQvsActJUjSFY7LIHTz3l+ya/FHcog7CZ7ZcVnOKtDuY9M7HhmcZLl1QmoN3SHhG/+tjfoGTxmL4apZbuLWOw=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.7/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.7/StockManager-1.3.7-x86_64.AppImage",
+  "release_notes": "Fix: Preserve active search filter in inventory section across background auto-refreshes",
+  "signature": "hyGGlH0+H5VFh+kja46krWeBY5uA5KmvFxNpl502+czOjR9yuqvX+UNVh99S8C3YojJVyXisNqx06FSKfVdEwnS0J+e/ujhnWilPrU/bf7DpILoA0qgWfaaJsMai/8UZAI2jvoUAD5w7sJskLT2POgTEEUENH59Gg6HQyQEfSXbD6t9vUcXl/5IiKUY+0kieg2DmYBDND+V4XSxumRMJF3GwROcs/qqeveX4HMCFv1pnASo0prqBO08YK+M5OnKuT7gAwNq0+nwRFKkITNcDOL8h7bv5vdplaqrlngDP3DWnnKfl8kZB2jWM1DdZ2Zf9Af97nj3mF2rAgE2U5nbR2w==",
+  "signature_linux": "jtXhEcclVgnHSUEz8Kx6WL8UnrSyyyEJPW+UvLADtskhW5vZ3s6eYLOolNhQBsddhr11EwBVwuFQkNmIWPVBDpH52DPQnODHH+hIv0inFK99HtfSsY7VgL/vhxV0NgtsihHmpdIb+mlxUfRRvlRJIasSfODWavuaGC2oeD+ZGQ1C6JWS8lmkLYNLQUH6eqMhmqoq+Nu4cR5NFcVNGptChelWYn6OW2WYvIbQfW5TwR2cwwyVwuEwjfiH01ogK2bkWDsONN0vrSrfisHUon6A8fH8nC8SN9bWGUtK39wJ6o8vtxxv1wfPePPuNswI4uVNBkSJhpXOaAaV5Msi77xtyQ=="
 }
