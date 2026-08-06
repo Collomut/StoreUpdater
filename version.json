@@ -1,9 +1,9 @@
 {
-  "version": "1.3.4",
+  "version": "1.3.5",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.4/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.4/StockManager-1.3.4-x86_64.AppImage",
-  "release_notes": "Security: C1-C3 critical fixes, H1-H5 high fixes, M1-M5 medium fixes, L2-L5 low fixes, audit log, logout endpoint, weekly backup",
-  "signature": "Pgna5jl9HnZVFrF4oUURzVqYpj6yuuDgN06uni2Qwn6w5Mfkvmjz7rOdthUnVmjmANzKQJSbJkDRzUpYMTmMcXXXL4+l6Nul+1wbFHrgLAk1IN3ZJYlhuAwhRXpy4w5KaSB+soE8tudHWyfUxkyrz2zWVolFVmMMPGRgTJhZwAv8H9Qz8v8ac8Erm/zQblqAyekoKRL3j4qfoRJckRUWvcChxW2vDGVoP25FeVgwEl/fe3NlJVi/aJ07VU0oYx6XHyI3UByaBIsg5nOc8epbf+MNFiNVcL1kBjrwHOW2YYVgp8LrcilXSTsSQ0iESg8NIrIZwNLne179gEXtY9oUow==",
-  "signature_linux": "MBEaqa7T5TQl3DnpdGZ4qgGzAcmL6pMrq2Ojy0BVcCQEku0h5Uw+nTrTH3cCM9bTNQOUF6aLC3qnHvZWxulwXa9x4vtAbN/6lT4ukVAL1BD79e5QT8eMm6NgqlwMLYq7FURCpAMelQSM+H8qKoooRm7boxU8WH/6lA070u+Q1y9FEcyp7flKBG8ECmsv6YiKmZVShqF8yVdStUeJxx5ViQWmVeuMilI33ID/hrBZvOSizpre/PM5pyEL+50UDM5LcsMG7BA7GBAhZnOTQbYjBJC68FwCDXqWiMCcpgm/yOTRuspEwGkXCbmDn9i6bWt/SfwWpXcXvGH5HOkUmavxAg=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.5/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.5/StockManager-1.3.5-x86_64.AppImage",
+  "release_notes": "Feature: Added Cash and Phone payment method tracking to sales and dashboard",
+  "signature": "WxpDo74N7GtCHbqqoFdWxB00Fh2JwNPpWO2rhL97XN+Xc8NMEu1UZK/p//Okd3vj5Y+e+HyejPx9aq88bK9xN2HWENPDCGDB4bqpTK5s3uRlTnsdqN0gLa6joQhkA8XiwfT8iA7wS22eZp/OwhmxXHroS0h9cjANbJWKqOho4UN5pKEvqQIwPj8AL5H1ycVssx2EQ0u6cbdpXOLwH0VGZqHjrzUP69/sqHvdJZzYSr13PYTyghuzhPZAihab7ttGDg4WAyRTDY1q0J3JgCloV1Wro16unAlDnsMJejau+B7cue5C/Jy8lU1IphnaHdcgoQDQEdDgGzo/g5y1OBB2iw==",
+  "signature_linux": "hbyS+i8SEsJsbQiVj21My3EnsmGosvlm2Yf+8O84mmhSEn1g1OB8JvRGwYi8QeS9SBdBIiDDvElsCpWJAOpIVxOm4hTRS+1PV1iFMnFILwQdGNp0WsurjBSusHn8wwLvz4dUs/qj3eOcIEPkR7sP6wZYBa7UJpttmvxjNlOetYYQpvfDXx57LWHUjd1ALS73wrW1cUOFydyCdirO1hdwcb0OqFkA/CZRSCfU/ogMK9sDgJIJRkWoY07vbv11KOVQ5/CWyqHf1aYcB0S0Aeveq1RK/Z2ptkhWg3Y+WzfcDfQ3xfmMHm6Wu9niBn8xxNdNZwQvyUwYd/zZbsZFX6V1tA=="
 }
