@@ -17,6 +17,7 @@ public class DashboardController {
     @FXML private Label lblLowStockCount;
     @FXML private Label lblWeekSales, lblMonthSales;
     @FXML private Label lblTodayCash, lblTodayPhone;
+    @FXML private Label lblTodayExpenses, lblNetCash;
     @FXML private VBox lowStockList;
     @FXML private Label lblShopName;
     @FXML private Button btnQuickInventory;  // relabelled for workers
@@ -50,13 +51,17 @@ public class DashboardController {
                 DatabaseManager db = DatabaseManager.getInstance();
                 DashboardData d = new DashboardData();
                 java.math.BigDecimal[] stats = db.getDashboardStats(shopId);
-                d.today    = stats[0].doubleValue();
-                d.week     = stats[1].doubleValue();
-                d.month    = stats[2].doubleValue();
-                d.stockVal = stats[3].doubleValue();
-                d.lowCount = stats[4].intValue();
+                d.today      = stats[0].doubleValue();
+                d.week       = stats[1].doubleValue();
+                d.month      = stats[2].doubleValue();
+                d.stockVal   = stats[3].doubleValue();
+                d.lowCount   = stats[4].intValue();
                 d.todayCash  = stats.length > 5 ? stats[5].doubleValue() : 0;
                 d.todayPhone = stats.length > 6 ? stats[6].doubleValue() : 0;
+                d.expenses   = stats.length > 7 ? stats[7].doubleValue() : 0;
+                d.expCash    = stats.length > 8 ? stats[8].doubleValue() : 0;
+                d.expPhone   = stats.length > 9 ? stats[9].doubleValue() : 0;
+
                 // 1 more round-trip for the list itself
                 d.lowProducts = db.getLowStockProducts(shopId);
                 // USD rate comes from cache (no extra round-trip after first load)
@@ -76,10 +81,19 @@ public class DashboardController {
             lblLowStockCount.setText(String.valueOf(d.lowCount));
             lblLowStockCount.setStyle(d.lowCount > 0
                 ? "-fx-text-fill: #CC0000; -fx-font-weight: bold;" : "-fx-text-fill: #000000;");
-            lblWeekSales.setText(formatRwf(d.week));
+            if (lblWeekSales != null) lblWeekSales.setText(formatRwf(d.week));
             lblMonthSales.setText(formatRwf(d.month));
             lblTodayCash.setText("Cash: " + formatRwf(d.todayCash));
             lblTodayPhone.setText("Phone: " + formatRwf(d.todayPhone));
+
+            if (lblTodayExpenses != null) {
+                lblTodayExpenses.setText(formatRwf(d.expenses));
+            }
+            if (lblNetCash != null) {
+                double netCash = d.todayCash - d.expCash;
+                lblNetCash.setText("Net Cash: " + formatRwf(netCash));
+            }
+
             renderLowStockList(d.lowProducts);
         });
 
@@ -131,10 +145,11 @@ public class DashboardController {
     @FXML private void handleRefresh()      { refresh(shopId); }
     @FXML private void handleGoInventory()  { mainController.navigateTo("inventory"); }
     @FXML private void handleGoSales()      { mainController.navigateTo("sales"); }
+    @FXML private void handleGoExpenses()   { mainController.navigateTo("expenses"); }
 
     private static class DashboardData {
         double usdRate, today, stockVal, week, month;
-        double todayCash, todayPhone;
+        double todayCash, todayPhone, expenses, expCash, expPhone;
         int lowCount;
         List<Product> lowProducts;
     }

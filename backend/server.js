@@ -220,6 +220,21 @@ async function initializeDatabase() {
       )
     `);
 
+    // ─── Expense Tracker table ────────────────────────────────────────────────
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS expenses (
+        id SERIAL PRIMARY KEY,
+        shop_id INTEGER NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        expense_date DATE NOT NULL DEFAULT CURRENT_DATE,
+        amount NUMERIC(12,2) NOT NULL CHECK (amount > 0),
+        category VARCHAR(50) NOT NULL DEFAULT 'Other',
+        payment_method VARCHAR(20) NOT NULL DEFAULT 'CASH',
+        notes TEXT,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+
     // Schema column migrations (idempotent)
     try { await client.query('ALTER TABLE products ALTER COLUMN cost_price TYPE NUMERIC(12,2)'); } catch (_) {}
     try { await client.query('ALTER TABLE products ALTER COLUMN selling_price TYPE NUMERIC(12,2)'); } catch (_) {}
@@ -283,6 +298,7 @@ const salesRouter    = require('./routes/sales');
 const shopsRouter    = require('./routes/shops');
 const settingsRouter = require('./routes/settings');
 const usersRouter    = require('./routes/users');
+const expensesRouter = require('./routes/expenses');
 
 app.use('/api/auth',     authRouter);
 app.use('/api/products', authenticateToken, productsRouter);
@@ -290,6 +306,7 @@ app.use('/api/sales',    authenticateToken, salesRouter);
 app.use('/api/shops',    authenticateToken, shopsRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/users',    authenticateToken, usersRouter);
+app.use('/api/expenses', authenticateToken, expensesRouter);
 
 app.get('/', (req, res) => {
   res.json({ status: 'Stock Manager API Backend is running.' });

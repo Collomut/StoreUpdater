@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.stockmanager.controller.ExpensesController"
+      styleClass="screen-root" spacing="20">
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label styleClass="screen-title" text="Expense Tracker"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <DatePicker fx:id="dpFrom" styleClass="form-field" prefWidth="130" promptText="From"/>
+        <Label text="to"/>
+        <DatePicker fx:id="dpTo" styleClass="form-field" prefWidth="130" promptText="To"/>
+        <Button text="Filter" styleClass="btn-secondary" onAction="#handleFilter"/>
+        <Button text="Refresh" styleClass="btn-outline" onAction="#handleRefresh"/>
+    </HBox>
+
+    <Label fx:id="lblStatus" styleClass="status-label" text=""/>
+
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        <!-- ── Quick Record Expense Form (Left Panel) ── -->
+        <VBox styleClass="settings-section" spacing="14" prefWidth="320" minWidth="300">
+            <Label styleClass="section-header" text="Record New Expense"/>
+            <Label styleClass="settings-hint" text="Track operational costs (transport, meals, utilities, supplies) deducted from daily sales."/>
+
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Date"/>
+                <DatePicker fx:id="dpExpenseDate" styleClass="form-field" maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Amount (RWF)"/>
+                <TextField fx:id="fldAmount" styleClass="form-field" promptText="e.g. 2000"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Category"/>
+                <ComboBox fx:id="cmbCategory" styleClass="combo-box" maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Payment Method"/>
+                <ComboBox fx:id="cmbPaymentMethod" styleClass="combo-box" maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Description / Notes"/>
+                <TextArea fx:id="txtNotes" styleClass="form-field" prefRowCount="3" promptText="e.g. Bus transport to market for stock purchase"/>
+            </VBox>
+
+            <Button text="Record Expense" styleClass="btn-primary" maxWidth="Infinity" onAction="#handleRecordExpense"/>
+        </VBox>
+
+        <!-- ── Expenses History Table & Summary (Right Panel) ── -->
+        <VBox spacing="12" HBox.hgrow="ALWAYS">
+            <!-- Summary Bar -->
+            <HBox styleClass="dashboard-panel" alignment="CENTER_LEFT" spacing="24" style="-fx-padding: 12 16;">
+                <VBox spacing="2">
+                    <Label styleClass="kpi-label" text="TOTAL EXPENSES"/>
+                    <Label fx:id="lblTotalExpenses" styleClass="kpi-value" text="RWF 0" style="-fx-text-fill: #CC0000;"/>
+                </VBox>
+                <VBox spacing="2">
+                    <Label styleClass="kpi-label" text="CASH EXPENSES"/>
+                    <Label fx:id="lblCashExpenses" styleClass="kpi-sub" text="RWF 0" style="-fx-font-weight: bold;"/>
+                </VBox>
+                <VBox spacing="2">
+                    <Label styleClass="kpi-label" text="PHONE EXPENSES"/>
+                    <Label fx:id="lblPhoneExpenses" styleClass="kpi-sub" text="RWF 0" style="-fx-font-weight: bold;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Table -->
+            <TableView fx:id="expenseTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colDate"     text="Date"         prefWidth="100"/>
+                    <TableColumn fx:id="colCategory" text="Category"     prefWidth="120"/>
+                    <TableColumn fx:id="colNotes"    text="Description"  prefWidth="220"/>
+                    <TableColumn fx:id="colPayment"  text="Payment"      prefWidth="90"/>
+                    <TableColumn fx:id="colAmount"   text="Amount (RWF)" prefWidth="120"/>
+                    <TableColumn fx:id="colUser"     text="Recorded By"  prefWidth="110"/>
+                    <TableColumn fx:id="colActions"  text="Actions"      prefWidth="90"/>
+                </columns>
+                <placeholder><Label text="No expenses recorded for this period." styleClass="table-placeholder"/></placeholder>
+            </TableView>
+        </VBox>
+    </HBox>
+
+</VBox>

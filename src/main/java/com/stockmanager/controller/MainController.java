@@ -26,6 +26,7 @@ public class MainController {
     @FXML private ToggleButton btnInventory;
     @FXML private ToggleButton btnSales;
     @FXML private ToggleButton btnHistory;
+    @FXML private ToggleButton btnExpenses;
     @FXML private ToggleButton btnReports;
     @FXML private ToggleButton btnOverview;
     @FXML private ToggleButton btnSettings;
@@ -41,12 +42,13 @@ public class MainController {
     private InventoryController inventoryController;
     private SalesController salesController;
     private HistoryController historyController;
+    private ExpensesController expensesController;
     private ReportsController reportsController;
     private OverviewController overviewController;
     private SettingsController settingsController;
 
     @FXML private Parent dashboardPane, inventoryPane, salesPane, historyPane,
-                         reportsPane, overviewPane, settingsPane;
+                         expensesPane, reportsPane, overviewPane, settingsPane;
 
     private final Map<Parent, Long> lastRefreshedAt = new java.util.HashMap<>();
     private static final long SKIP_AUTO_REFRESH_MS = 15_000L; // skip if loaded < 15s ago
@@ -58,8 +60,9 @@ public class MainController {
         btnInventory.setToggleGroup(navGroup);
         btnSales.setToggleGroup(navGroup);
         btnHistory.setToggleGroup(navGroup);
+        if (btnExpenses != null) btnExpenses.setToggleGroup(navGroup);
         btnReports.setToggleGroup(navGroup);
-        if (btnOverview  != null) btnOverview.setToggleGroup(navGroup);
+        if (btnOverview != null) btnOverview.setToggleGroup(navGroup);
         btnSettings.setToggleGroup(navGroup);
 
         // Show current user in sidebar
@@ -86,6 +89,7 @@ public class MainController {
         btnInventory.setOnAction(e -> showPane(inventoryPane));
         btnSales.setOnAction(e ->     showPane(salesPane));
         btnHistory.setOnAction(e ->   showPane(historyPane));
+        if (btnExpenses != null) btnExpenses.setOnAction(e -> showPane(expensesPane));
         btnReports.setOnAction(e ->   showPane(reportsPane));
         if (btnOverview != null) btnOverview.setOnAction(e -> showPane(overviewPane));
         btnSettings.setOnAction(e ->  showPane(settingsPane));
@@ -152,6 +156,10 @@ public class MainController {
             historyPane = hl.load(); historyController = hl.getController();
             historyController.setMainController(this);
 
+            FXMLLoader el = new FXMLLoader(getClass().getResource("/fxml/expenses.fxml"));
+            expensesPane = el.load(); expensesController = el.getController();
+            expensesController.setMainController(this);
+
             FXMLLoader rl = new FXMLLoader(getClass().getResource("/fxml/reports.fxml"));
             reportsPane = rl.load(); reportsController = rl.getController();
             reportsController.setMainController(this);
@@ -197,6 +205,8 @@ public class MainController {
             salesController.refresh(currentShopId);
         else if (current == historyPane && historyController != null)
             historyController.refresh(currentShopId);
+        else if (current == expensesPane && expensesController != null)
+            expensesController.refresh(currentShopId, currentShopName);
         else if (current == reportsPane && reportsController != null)
             reportsController.refresh(currentShopId);
         else if (current == overviewPane && overviewController != null)
@@ -214,6 +224,7 @@ public class MainController {
             case "inventory" -> { btnInventory.setSelected(true); showPane(inventoryPane); }
             case "sales"     -> { btnSales.setSelected(true);     showPane(salesPane); }
             case "dashboard" -> { btnDashboard.setSelected(true); showPane(dashboardPane); }
+            case "expenses"  -> { if (btnExpenses != null) btnExpenses.setSelected(true); showPane(expensesPane); }
         }
     }
 }

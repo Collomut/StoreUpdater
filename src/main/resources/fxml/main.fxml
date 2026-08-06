@@ -28,6 +28,7 @@
             <ToggleButton fx:id="btnInventory" styleClass="nav-btn" text="Inventory"    maxWidth="Infinity"/>
             <ToggleButton fx:id="btnSales"     styleClass="nav-btn" text="Record Sale"  maxWidth="Infinity"/>
             <ToggleButton fx:id="btnHistory"   styleClass="nav-btn" text="Sales History" maxWidth="Infinity"/>
+            <ToggleButton fx:id="btnExpenses"  styleClass="nav-btn" text="Expenses"      maxWidth="Infinity"/>
             <ToggleButton fx:id="btnReports"   styleClass="nav-btn" text="Reports"      maxWidth="Infinity"/>
             <ToggleButton fx:id="btnOverview"  styleClass="nav-btn" text="All Shops"    maxWidth="Infinity"/>
 

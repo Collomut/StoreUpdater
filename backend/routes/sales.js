@@ -215,8 +215,18 @@ router.get('/dashboard-stats', async (req, res) => {
       [shopId]
     );
 
+    const eRes = await pool.query(
+      `SELECT
+         COALESCE(SUM(CASE WHEN expense_date = CURRENT_DATE THEN amount END), 0)::float8                               AS today_expenses,
+         COALESCE(SUM(CASE WHEN expense_date = CURRENT_DATE AND payment_method = 'CASH'  THEN amount END), 0)::float8 AS today_exp_cash,
+         COALESCE(SUM(CASE WHEN expense_date = CURRENT_DATE AND payment_method = 'PHONE' THEN amount END), 0)::float8 AS today_exp_phone
+       FROM expenses WHERE shop_id = $1`,
+      [shopId]
+    );
+
     const stats    = sRes.rows[0];
     const products = pRes.rows[0];
+    const expenses = eRes.rows[0];
 
     return res.json([
       stats.today_sales  || 0.0,
@@ -225,7 +235,10 @@ router.get('/dashboard-stats', async (req, res) => {
       products.stock_value || 0.0,
       parseFloat(products.low_count || 0),
       stats.today_cash   || 0.0,
-      stats.today_phone  || 0.0
+      stats.today_phone  || 0.0,
+      expenses.today_expenses || 0.0,
+      expenses.today_exp_cash || 0.0,
+      expenses.today_exp_phone || 0.0
     ]);
   } catch (err) {
     console.error('Dashboard stats error:', err.message);

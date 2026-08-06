@@ -26,6 +26,7 @@ public class DatabaseManager {
     private final ShopRepository shopRepository;
     private final ProductRepository productRepository;
     private final SaleRepository saleRepository;
+    private final ExpenseRepository expenseRepository;
 
     private DatabaseManager() {
         try {
@@ -77,6 +78,7 @@ public class DatabaseManager {
             shopRepository = new ShopRepository(this);
             productRepository = new ProductRepository(this);
             saleRepository = new SaleRepository(this);
+            expenseRepository = new ExpenseRepository(this);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize backend API connection: " + e.getMessage(), e);
         }
@@ -130,6 +132,12 @@ public class DatabaseManager {
     public ShopRepository getShopRepository() { return shopRepository; }
     public ProductRepository getProductRepository() { return productRepository; }
     public SaleRepository getSaleRepository() { return saleRepository; }
+    public ExpenseRepository getExpenseRepository() { return expenseRepository; }
+
+    // ─── Expense Facade ──────────────────────────────────────────────────────
+    public List<com.stockmanager.model.Expense> getExpenses(int shopId, java.time.LocalDate from, java.time.LocalDate to) { return expenseRepository.getExpenses(shopId, from, to); }
+    public boolean addExpense(int shopId, java.time.LocalDate expenseDate, java.math.BigDecimal amount, String category, String paymentMethod, String notes) { return expenseRepository.addExpense(shopId, expenseDate, amount, category, paymentMethod, notes); }
+    public boolean deleteExpense(int expenseId) { return expenseRepository.deleteExpense(expenseId); }
 
     // ─── Backward-compatible Delegation Facade ────────────────────────────────
 

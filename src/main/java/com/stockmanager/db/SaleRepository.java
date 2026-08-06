@@ -226,13 +226,13 @@ public class SaleRepository {
     }
 
     public BigDecimal[] getDashboardStats(int shopId) {
-        BigDecimal[] r = new BigDecimal[7];
+        BigDecimal[] r = new BigDecimal[10];
         Arrays.fill(r, BigDecimal.ZERO);
         try {
             HttpResponse<String> response = HttpDatabaseClient.get("/api/sales/dashboard-stats?shopId=" + shopId);
             if (response.statusCode() == 200) {
                 JsonArray arr = JsonParser.parseString(response.body()).getAsJsonArray();
-                for (int i = 0; i < Math.min(arr.size(), 7); i++) {
+                for (int i = 0; i < Math.min(arr.size(), 10); i++) {
                     r[i] = BigDecimal.valueOf(arr.get(i).getAsDouble());
                 }
             }
