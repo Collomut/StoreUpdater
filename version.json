@@ -1,9 +1,9 @@
 {
-  "version": "1.3.8",
+  "version": "1.3.9",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.8/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.8/StockManager-1.3.8-x86_64.AppImage",
-  "release_notes": "Fix: Resolve Add User failure in Settings admin panel and propagate API error messages",
-  "signature": "VPr1OCNuylRkJZBOoP86ITyM9t/V00/LeZkCCZlre8eTKU5F0o4zuHsVNKgWvE4jfawEC8NQNGc1Oj+3+8YLPX9PnQ8RiPsITnBGBZZP5EKC2+WSIW4OmQwsJ2VuP0IhgaDct2RdWSU2p1/h6lI7p8WJpZcBoaIiYuscG33cWHqTQdgs4QNbRwwiSMp+7p9153ZNc8rbjuMT6+skezS7CxpRNIvadQ/LlbuPfz6FmWT4YCoQcxuySRD0VbSdqD1X4gWQrwayXAO8dLzlagB566RFbLNd7r6PfD4zUtU1VvmQdZGpzMS0W0j/SOZrDSUFsnAwUf/u95bD5Ennkw6s2g==",
-  "signature_linux": "A70go02IWuMbbdoyDvno68Bdy+Jv0K86xjgOmSWiLfoSFuljvug0dA9lyJ67JC2ya++6IQem9f4R+d480SxIMeBVKXTe+mf8kDfBXCYvvBJtWtTnjPqmpSV68MedU1/Ft7OsbWQy+5BkMOPWO/8CpiDchqA35zMCgZbPoVGxD68KhOPzb22xsBZDQbpmb+VWeRAR3PgLnzgFfqxVx6HfVqYFZa+1YaIt9fgAt1Lei8UGiFFHyV8jLZzve8SNw6apkgY9sthNqQtQUsDaf7zyNAuQ12IYZ74Dp4uDevPvhksxst07NIm+bLfK8KdHU1kGbfsn99KXP0AvqajY09J1Vw=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.9/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.9/StockManager-1.3.9-x86_64.AppImage",
+  "release_notes": "Feature: Add Assign Shop button in Settings admin panel to manage worker shop assignments",
+  "signature": "PdWG2PXHmALGs0MqCNbKaAY3DvUWUidY4nZOzZkwmqlmzFZ7t8e75f8qE9s1Y+FMppyuOTlFN5vLJh6aXsSzxA1YjOah0lZQ91v2qIPbLc7rhgGc5umLftzXWzc5nIEJuEvWnfLS659kNCpnZYMRtkpNmgZf5ewPtqkPlZOg+0D304VKkd+7Ca1Twmr5Mztt+pXN/gQeSnuXdnKqz5unMf8vhiWHnYBonlljwZsvJ3aL+gQgwAsX6pxWzzZNvZuttyRsV6CLQT3qXT6x03ML8Q8qC1iF/zjUGgHIuu38o8IHM5DTIrvfDOY3ScnOn38Y2EQLUDbQv1rSX67V8eXcmQ==",
+  "signature_linux": "NXwM3a2RQnvs9wocp3psCRwZ++Rc2RQCp2s0bS9I+e7kgeucO5gSAxx5Sl03fjZa0qsLrOOlBQYYJeD4NIPqhyor32WpqrK2Oen3V5lOwbRbg2BK0guPrWG/t4zuVk3yNmwIgtJovsFKdj1aClnGXkxNXAI7niQafKn0u2Jo09HUOHgBr3+0KmlBpMG+Zmah+p7AJaT22IirnMMzRzqOkeXgSBoykQeZfmdIUfTvlPQR1uY7PwpJM3PpAGh1YQAmye/NtkkAb0ps4kfdVN1q/XJawOjrZkdDjqY2q1d89XzmT/ifchpmtIrLmPC6cqOVsqbXd//e2vhAR1Xbt1l8NA=="
 }
