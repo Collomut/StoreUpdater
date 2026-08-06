@@ -3,9 +3,13 @@ const router = express.Router();
 
 // POST /api/sales — Record a transaction (uses database transaction)
 router.post('/', async (req, res) => {
-  const { shopId, saleDate, totalAmount, items } = req.body;
+  const { shopId, saleDate, totalAmount, items, paymentMethod } = req.body;
   const pool     = req.app.get('dbPool');
   const auditLog = req.app.get('auditLog');
+
+  // Validate payment method (default to CASH)
+  const validMethods = ['CASH', 'PHONE'];
+  const method = validMethods.includes(paymentMethod) ? paymentMethod : 'CASH';
 
   if (!shopId || !saleDate || !totalAmount || !items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: 'Invalid sale transaction payload' });
@@ -38,8 +42,8 @@ router.post('/', async (req, res) => {
 
     // Insert sale header
     const saleInsertRes = await client.query(
-      'INSERT INTO sales (shop_id, sale_date, total_amount, receipt_number) VALUES ($1, $2, $3, $4) RETURNING id',
-      [shopId, saleDate, totalAmount, receiptNo]
+      'INSERT INTO sales (shop_id, sale_date, total_amount, receipt_number, payment_method) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [shopId, saleDate, totalAmount, receiptNo, method]
     );
     const saleId = saleInsertRes.rows[0].id;
 
@@ -76,7 +80,7 @@ router.post('/', async (req, res) => {
 
     // F-1: Audit the sale
     await auditLog(pool, req.user.userId, 'SALE_RECORDED',
-      `Receipt ${receiptNo} — ${items.length} item(s), total ${totalAmount} — shop ${shopId}`);
+      `Receipt ${receiptNo} — ${items.length} item(s), total ${totalAmount} [${method}] — shop ${shopId}`);
 
     return res.json({ saleId, receiptNumber: receiptNo });
   } catch (err) {
@@ -104,7 +108,7 @@ router.get('/', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT id, shop_id, sale_date::text, total_amount::float8, receipt_number FROM sales WHERE shop_id = $1 AND sale_date BETWEEN $2 AND $3 ORDER BY sale_date DESC, id DESC',
+      'SELECT id, shop_id, sale_date::text, total_amount::float8, receipt_number, payment_method FROM sales WHERE shop_id = $1 AND sale_date BETWEEN $2 AND $3 ORDER BY sale_date DESC, id DESC',
       [shopId, from, to]
     );
     return res.json(result.rows);
@@ -160,7 +164,7 @@ router.get('/flat-rows', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT s.sale_date::text, s.receipt_number, s.total_amount::float8,
+      `SELECT s.sale_date::text, s.receipt_number, s.total_amount::float8, s.payment_method,
               p.name AS product_name, p.category AS product_category, p.unit AS product_unit,
               si.quantity_sold, si.unit_price::float8, sh.name AS shop_name
        FROM sale_items si
@@ -196,7 +200,9 @@ router.get('/dashboard-stats', async (req, res) => {
       `SELECT
          COALESCE(SUM(CASE WHEN sale_date = CURRENT_DATE THEN total_amount END), 0)::float8              AS today_sales,
          COALESCE(SUM(CASE WHEN sale_date >= date_trunc('week',  CURRENT_DATE) THEN total_amount END), 0)::float8 AS week_sales,
-         COALESCE(SUM(CASE WHEN sale_date >= date_trunc('month', CURRENT_DATE) THEN total_amount END), 0)::float8 AS month_sales
+         COALESCE(SUM(CASE WHEN sale_date >= date_trunc('month', CURRENT_DATE) THEN total_amount END), 0)::float8 AS month_sales,
+         COALESCE(SUM(CASE WHEN sale_date = CURRENT_DATE AND payment_method = 'CASH'  THEN total_amount END), 0)::float8 AS today_cash,
+         COALESCE(SUM(CASE WHEN sale_date = CURRENT_DATE AND payment_method = 'PHONE' THEN total_amount END), 0)::float8 AS today_phone
        FROM sales WHERE shop_id = $1`,
       [shopId]
     );
@@ -217,7 +223,9 @@ router.get('/dashboard-stats', async (req, res) => {
       stats.week_sales   || 0.0,
       stats.month_sales  || 0.0,
       products.stock_value || 0.0,
-      parseFloat(products.low_count || 0)
+      parseFloat(products.low_count || 0),
+      stats.today_cash   || 0.0,
+      stats.today_phone  || 0.0
     ]);
   } catch (err) {
     console.error('Dashboard stats error:', err.message);

@@ -16,7 +16,7 @@ import java.util.List;
 public class HistoryController {
 
     @FXML private TableView<FlatSaleRow> salesTable;
-    @FXML private TableColumn<FlatSaleRow, String>  colDate, colReceipt, colTotal, colProduct, colUnitPrice, colSubtotal;
+    @FXML private TableColumn<FlatSaleRow, String>  colDate, colReceipt, colTotal, colProduct, colUnitPrice, colSubtotal, colPayment;
     @FXML private TableColumn<FlatSaleRow, Integer> colQty;
     @FXML private DatePicker fromDate, toDate;
     @FXML private Label lblGrandTotal;
@@ -38,6 +38,8 @@ public class HistoryController {
             String.format("RWF %,.0f", d.getValue().unitPrice)));
         colSubtotal.setCellValueFactory(d -> new SimpleStringProperty(
             String.format("RWF %,.0f", d.getValue().getSubtotal())));
+        colPayment.setCellValueFactory(d -> new SimpleStringProperty(
+            "PHONE".equals(d.getValue().paymentMethod) ? "Phone" : "Cash"));
 
         fromDate.setValue(LocalDate.now().withDayOfMonth(1));
         toDate.setValue(LocalDate.now());

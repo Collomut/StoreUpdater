@@ -173,7 +173,8 @@ async function initializeDatabase() {
         shop_id INTEGER NOT NULL REFERENCES shops(id),
         sale_date DATE NOT NULL,
         total_amount NUMERIC(12,2) NOT NULL,
-        receipt_number VARCHAR(50)
+        receipt_number VARCHAR(50),
+        payment_method VARCHAR(20) NOT NULL DEFAULT 'CASH'
       )
     `);
 
@@ -229,6 +230,8 @@ async function initializeDatabase() {
     try { await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP'); } catch (_) {}
     // H-5: token_version column for JWT revocation
     try { await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0'); } catch (_) {}
+    // Payment method column for sales
+    try { await client.query("ALTER TABLE sales ADD COLUMN IF NOT EXISTS payment_method VARCHAR(20) NOT NULL DEFAULT 'CASH'"); } catch (_) {}
 
     // Seed default data if empty
     const shopsRes = await client.query('SELECT COUNT(*) FROM shops');

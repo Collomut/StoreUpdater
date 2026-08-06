@@ -16,6 +16,7 @@ public class DashboardController {
     @FXML private Label lblStockValue, lblStockValueUsd;
     @FXML private Label lblLowStockCount;
     @FXML private Label lblWeekSales, lblMonthSales;
+    @FXML private Label lblTodayCash, lblTodayPhone;
     @FXML private VBox lowStockList;
     @FXML private Label lblShopName;
     @FXML private Button btnQuickInventory;  // relabelled for workers
@@ -44,6 +45,8 @@ public class DashboardController {
                 d.month    = stats[2].doubleValue();
                 d.stockVal = stats[3].doubleValue();
                 d.lowCount = stats[4].intValue();
+                d.todayCash  = stats.length > 5 ? stats[5].doubleValue() : 0;
+                d.todayPhone = stats.length > 6 ? stats[6].doubleValue() : 0;
                 // 1 more round-trip for the list itself
                 d.lowProducts = db.getLowStockProducts(shopId);
                 // USD rate comes from cache (no extra round-trip after first load)
@@ -65,6 +68,8 @@ public class DashboardController {
                 ? "-fx-text-fill: #CC0000; -fx-font-weight: bold;" : "-fx-text-fill: #000000;");
             lblWeekSales.setText(formatRwf(d.week));
             lblMonthSales.setText(formatRwf(d.month));
+            lblTodayCash.setText("Cash: " + formatRwf(d.todayCash));
+            lblTodayPhone.setText("Phone: " + formatRwf(d.todayPhone));
             renderLowStockList(d.lowProducts);
         });
 
@@ -110,6 +115,7 @@ public class DashboardController {
 
     private static class DashboardData {
         double usdRate, today, stockVal, week, month;
+        double todayCash, todayPhone;
         int lowCount;
         List<Product> lowProducts;
     }

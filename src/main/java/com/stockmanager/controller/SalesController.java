@@ -31,6 +31,7 @@ public class SalesController {
     @FXML private Label lblTotal, lblTotalUsd;
     @FXML private TextField notesField;
     @FXML private DatePicker datePicker;
+    @FXML private ComboBox<String> paymentMethodCombo;
 
     private MainController mainController;
     private int    shopId;
@@ -77,6 +78,8 @@ public class SalesController {
         basketTable.setItems(basketItems);
         datePicker.setValue(LocalDate.now());
         qtyField.setText("1");
+        paymentMethodCombo.setItems(FXCollections.observableArrayList("Cash", "Phone"));
+        paymentMethodCombo.setValue("Cash");
 
         // Register size-filter listener once here — NOT inside setupSizeFilter()
         // so it doesn't get re-added on every shop refresh
@@ -322,6 +325,8 @@ public class SalesController {
         sale.setShopId(shopId);
         sale.setSaleDate(datePicker.getValue() != null ? datePicker.getValue() : LocalDate.now());
         sale.setNotes(notesField.getText().trim());
+        String selectedMethod = paymentMethodCombo.getValue();
+        sale.setPaymentMethod("Phone".equals(selectedMethod) ? "PHONE" : "CASH");
         basketItems.forEach(sale::addItem);
         sale.setTotalAmount(basketItems.stream()
             .map(SaleItem::getSubtotal)

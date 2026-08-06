@@ -66,8 +66,11 @@
             <placeholder><Label text="No items yet. Select a product and add to basket." styleClass="table-placeholder"/></placeholder>
         </TableView>
 
-        <!-- Total -->
-        <HBox alignment="CENTER_RIGHT" spacing="20">
+        <!-- Total & Payment Method -->
+        <HBox alignment="CENTER_LEFT" spacing="16">
+            <Label styleClass="form-label" text="Payment:"/>
+            <ComboBox fx:id="paymentMethodCombo" styleClass="form-field" prefWidth="120"/>
+            <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="lblTotalUsd" styleClass="total-usd" text="≈ USD 0.00"/>
             <Label fx:id="lblTotal" styleClass="total-label" text="Total: RWF 0"/>
         </HBox>

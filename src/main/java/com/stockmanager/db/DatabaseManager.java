@@ -187,8 +187,12 @@ public class DatabaseManager {
         public final String product;
         public final int qty;
         public final BigDecimal unitPrice;
+        public final String paymentMethod;
         public FlatSaleRow(LocalDate d, String r, BigDecimal t, String p, int q, BigDecimal u) {
-            date=d; receipt=r; saleTotal=t; product=p; qty=q; unitPrice=u;
+            date=d; receipt=r; saleTotal=t; product=p; qty=q; unitPrice=u; paymentMethod="CASH";
+        }
+        public FlatSaleRow(LocalDate d, String r, BigDecimal t, String p, int q, BigDecimal u, String pm) {
+            date=d; receipt=r; saleTotal=t; product=p; qty=q; unitPrice=u; paymentMethod=pm != null ? pm : "CASH";
         }
         public BigDecimal getSubtotal() { return BigDecimal.valueOf(qty).multiply(unitPrice); }
     }

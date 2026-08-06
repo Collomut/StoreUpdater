@@ -43,6 +43,7 @@
             <TableColumn fx:id="colQty"      text="Qty"          prefWidth="70"/>
             <TableColumn fx:id="colUnitPrice" text="Unit Price"  prefWidth="120"/>
             <TableColumn fx:id="colSubtotal" text="Subtotal"     prefWidth="120"/>
+            <TableColumn fx:id="colPayment"  text="Payment"     prefWidth="80"/>
         </columns>
         <placeholder><Label text="No sales found for this period." styleClass="table-placeholder"/></placeholder>
     </TableView>

@@ -12,6 +12,7 @@ public class Sale {
     private BigDecimal totalAmount = BigDecimal.ZERO;
     private String notes;
     private String receiptNumber;
+    private String paymentMethod = "CASH";
     private List<SaleItem> items = new ArrayList<>();
 
     public Sale() {}
@@ -21,6 +22,7 @@ public class Sale {
         this.id = id; this.shopId = shopId; this.saleDate = saleDate;
         this.totalAmount = totalAmount; this.notes = notes;
         this.receiptNumber = receiptNumber;
+        this.paymentMethod = "CASH";
     }
 
     public int getId() { return id; }
@@ -35,6 +37,8 @@ public class Sale {
     public void setNotes(String notes) { this.notes = notes; }
     public String getReceiptNumber() { return receiptNumber; }
     public void setReceiptNumber(String receiptNumber) { this.receiptNumber = receiptNumber; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     public List<SaleItem> getItems() { return items; }
     public void setItems(List<SaleItem> items) { this.items = items; }
     public void addItem(SaleItem item) { this.items.add(item); }

@@ -31,6 +31,7 @@ public class SaleRepository {
             payload.addProperty("shopId", sale.getShopId());
             payload.addProperty("saleDate", sale.getSaleDate().toString());
             payload.addProperty("totalAmount", sale.getTotalAmount().doubleValue());
+            payload.addProperty("paymentMethod", sale.getPaymentMethod());
 
             JsonArray itemArray = new JsonArray();
             for (SaleItem item : sale.getItems()) {
@@ -70,6 +71,8 @@ public class SaleRepository {
                     s.setSaleDate(LocalDate.parse(obj.get("sale_date").getAsString()));
                     s.setTotalAmount(BigDecimal.valueOf(obj.get("total_amount").getAsDouble()));
                     s.setReceiptNumber(obj.get("receipt_number").getAsString());
+                    JsonElement pmEl = obj.get("payment_method");
+                    s.setPaymentMethod(pmEl != null && !pmEl.isJsonNull() ? pmEl.getAsString() : "CASH");
                     list.add(s);
                 }
             }
@@ -192,13 +195,17 @@ public class SaleRepository {
                         fullProductName = pName;
                     }
 
+                    JsonElement pmEl = obj.get("payment_method");
+                    String payMethod = pmEl != null && !pmEl.isJsonNull() ? pmEl.getAsString() : "CASH";
+
                     list.add(new FlatSaleRow(
                         LocalDate.parse(obj.get("sale_date").getAsString()),
                         obj.get("receipt_number").getAsString(),
                         BigDecimal.valueOf(obj.get("total_amount").getAsDouble()),
                         fullProductName,
                         obj.get("quantity_sold").getAsInt(),
-                        BigDecimal.valueOf(obj.get("unit_price").getAsDouble())
+                        BigDecimal.valueOf(obj.get("unit_price").getAsDouble()),
+                        payMethod
                     ));
                 }
             }
@@ -219,13 +226,13 @@ public class SaleRepository {
     }
 
     public BigDecimal[] getDashboardStats(int shopId) {
-        BigDecimal[] r = new BigDecimal[5];
+        BigDecimal[] r = new BigDecimal[7];
         Arrays.fill(r, BigDecimal.ZERO);
         try {
             HttpResponse<String> response = HttpDatabaseClient.get("/api/sales/dashboard-stats?shopId=" + shopId);
             if (response.statusCode() == 200) {
                 JsonArray arr = JsonParser.parseString(response.body()).getAsJsonArray();
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < Math.min(arr.size(), 7); i++) {
                     r[i] = BigDecimal.valueOf(arr.get(i).getAsDouble());
                 }
             }
