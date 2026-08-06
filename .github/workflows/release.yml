@@ -95,119 +95,10 @@ jobs:
           path: dist-installer/StockManager-Setup-${{ inputs.version }}.exe
           retention-days: 1
 
-  # ── Build Linux AppImage ────────────────────────────────────────────────────
-  build-linux:
-    name: Linux — Build AppImage
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'microsoft'
-          cache: 'maven'
-
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends \
-            libfuse2 fuse imagemagick \
-            libgtk-3-0 libgl1 libglu1-mesa \
-            libxtst6 libxxf86vm1 libasound2t64
-
-      - name: Write config.properties (from secrets)
-        run: |
-          cat > src/main/resources/config.properties << 'EOF'
-          db.url=${{ secrets.DB_URL }}
-          db.user=${{ secrets.DB_USER }}
-          db.password=${{ secrets.DB_PASSWORD }}
-          EOF
-
-      - name: Set version
-        run: echo "app.version=${{ inputs.version }}" > src/main/resources/version.properties
-
-      - name: Build fat JAR
-        run: mvn package -q
-
-      - name: Build Linux app-image
-        run: |
-          mkdir -p package-input
-          cp target/StockManager-1.0.0.jar package-input/
-          jpackage \
-            --type app-image \
-            --input package-input \
-            --main-jar StockManager-1.0.0.jar \
-            --name StockManager \
-            --app-version ${{ inputs.version }} \
-            --icon src/main/resources/images/icon.png \
-            --java-options "-Djava.net.preferIPv4Stack=true" \
-            --dest dist
-          rm -rf package-input
-
-      - name: Download appimagetool
-        run: |
-          wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" \
-            -O appimagetool
-          chmod +x appimagetool
-
-      - name: Create AppDir structure
-        run: |
-          mkdir -p AppDir
-
-          # Copy entire jpackage app-image into AppDir
-          cp -r dist/StockManager/. AppDir/
-
-          # AppRun — entry point for the AppImage
-          cat > AppDir/AppRun << 'APPRUN'
-          #!/bin/bash
-          HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-          export APPDIR="${HERE}"
-          exec "${HERE}/bin/StockManager" "$@"
-          APPRUN
-          chmod +x AppDir/AppRun
-
-          # .desktop file
-          cat > AppDir/StockManager.desktop << 'DESKTOP'
-          [Desktop Entry]
-          Type=Application
-          Name=Stock Manager
-          Exec=StockManager
-          Icon=StockManager
-          Categories=Office;Finance;
-          Comment=Retail Stock Management System
-          DESKTOP
-
-          # Use the beautiful custom logo icon
-          cp src/main/resources/images/icon.png AppDir/StockManager.png
-
-      - name: Build AppImage
-        env:
-          ARCH: x86_64
-          VERSION: ${{ inputs.version }}
-        run: |
-          ./appimagetool --appimage-extract-and-run AppDir \
-            "StockManager-${VERSION}-x86_64.AppImage" 2>&1 || \
-          ARCH=x86_64 ./appimagetool AppDir \
-            "StockManager-${VERSION}-x86_64.AppImage"
-          chmod +x "StockManager-${VERSION}-x86_64.AppImage"
-          ls -lh "StockManager-${VERSION}-x86_64.AppImage"
-
-      - name: Upload Linux AppImage artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-appimage
-          path: StockManager-${{ inputs.version }}-x86_64.AppImage
-          retention-days: 1
-
   # ── Create GitHub Release ───────────────────────────────────────────────────
   publish-release:
     name: Publish GitHub Release
-    needs: [build-windows, build-linux]
-    if: always() && !cancelled() && needs.build-windows.result == 'success'
+    needs: [build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -240,26 +131,20 @@ jobs:
           openssl dgst -sha256 -sign key.pem -out jar.sig "artifacts/jar/StockManager-1.0.0.jar"
           JAR_SIG=$(base64 -w 0 jar.sig)
 
-          # 4. Sign the AppImage file
-          openssl dgst -sha256 -sign key.pem -out appimage.sig "artifacts/linux-appimage/StockManager-${VERSION}-x86_64.AppImage"
-          APPIMAGE_SIG=$(base64 -w 0 appimage.sig)
+          # 4. Clean up temporary keys/signatures
+          rm -f key.der key.pem jar.sig
 
-          # 5. Clean up temporary keys/signatures
-          rm -f key.der key.pem jar.sig appimage.sig
-
-          # 6. Extract previous api_url if it exists
+          # 5. Extract previous api_url if it exists
           PREV_API_URL=$(grep -oP '"api_url"\s*:\s*"\K[^"]+' version.json || echo "https://stockmanager-api.onrender.com")
 
-          # 7. Generate the signed version.json
+          # 6. Generate the signed version.json
           cat > version.json << EOF
           {
             "version": "${VERSION}",
             "api_url": "${PREV_API_URL}",
             "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v${VERSION}/StockManager-1.0.0.jar",
-            "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v${VERSION}/StockManager-${VERSION}-x86_64.AppImage",
             "release_notes": "${NOTES}",
-            "signature": "${JAR_SIG}",
-            "signature_linux": "${APPIMAGE_SIG}"
+            "signature": "${JAR_SIG}"
           }
           EOF
           cat version.json
@@ -288,7 +173,6 @@ jobs:
             echo "| Platform | File | Notes |"
             echo "|---|---|---|"
             echo "| 🪟 Windows | \`StockManager-Setup-${VERSION}.exe\` | Wizard installer, no Java needed |"
-            echo "| 🐧 Linux | \`StockManager-${VERSION}-x86_64.AppImage\` | Any distro, no Java needed — mark executable and run |"
             echo "| ☕ Any (JAR) | \`StockManager-1.0.0.jar\` | Requires Java 21 installed |"
             echo ""
             echo "### Auto-Update"
@@ -304,6 +188,6 @@ jobs:
           gh release create "v${VERSION}" \
             "artifacts/jar/StockManager-1.0.0.jar" \
             "artifacts/windows-installer/StockManager-Setup-${VERSION}.exe" \
-            "artifacts/linux-appimage/StockManager-${VERSION}-x86_64.AppImage" \
             --title "Stock Manager v${VERSION}" \
             --notes-file release_notes.md
+
