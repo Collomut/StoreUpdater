@@ -23,6 +23,7 @@ public class DashboardController {
 
     private MainController mainController;
     private int shopId;
+    private String shopName = "";
 
     public void setMainController(MainController mc) {
         this.mainController = mc;
@@ -33,7 +34,16 @@ public class DashboardController {
     }
 
     public void refresh(int shopId) {
+        String sName = DatabaseManager.getInstance().getAllShops().stream()
+            .filter(s -> s.getId() == shopId)
+            .map(com.stockmanager.model.Shop::getName)
+            .findFirst().orElse("");
+        refresh(shopId, sName);
+    }
+
+    public void refresh(int shopId, String shopName) {
         this.shopId = shopId;
+        this.shopName = shopName != null ? shopName : "";
 
         Task<DashboardData> task = new Task<>() {
             @Override protected DashboardData call() {
@@ -86,15 +96,24 @@ public class DashboardController {
             lowStockList.getChildren().add(ok);
             return;
         }
+        boolean isNyabugogo = shopName != null && shopName.toLowerCase().contains("nyabugogo");
         for (Product p : lowStock) {
             HBox row = new HBox(10);
             row.getStyleClass().add("low-stock-row");
-            Label nameLabel = new Label(p.getName());
+
+            String color = (p.getCategory() != null && !p.getCategory().isBlank()) ? p.getCategory() : "";
+            String size  = (p.getUnit() != null && !p.getUnit().isBlank()) ? p.getUnit() : "";
+            
+            String displayName = isNyabugogo
+                ? p.getName() + (color.isEmpty() ? "" : " — " + color) + (size.isEmpty() ? "" : " (" + size + ")")
+                : p.getName();
+
+            Label nameLabel = new Label(displayName);
             nameLabel.getStyleClass().add("low-stock-name");
             Label qtyLabel = new Label("Qty: " + p.getQuantity());
             qtyLabel.getStyleClass().add("low-stock-qty");
             Region spacer = new Region(); HBox.setHgrow(spacer, Priority.ALWAYS);
-            Label catLabel = new Label(p.getCategory() != null ? p.getCategory() : "");
+            Label catLabel = new Label(isNyabugogo ? "" : (p.getCategory() != null ? p.getCategory() : ""));
             catLabel.getStyleClass().add("low-stock-cat");
             row.getChildren().addAll(nameLabel, spacer, qtyLabel, catLabel);
             lowStockList.getChildren().add(row);

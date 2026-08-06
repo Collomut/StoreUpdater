@@ -189,7 +189,7 @@ public class MainController {
         Parent current = (Parent) contentArea.getChildren().get(0);
         lastRefreshedAt.put(current, System.currentTimeMillis());
         if (current == dashboardPane && dashboardController != null)
-            dashboardController.refresh(currentShopId);
+            dashboardController.refresh(currentShopId, currentShopName);
         else if (current == inventoryPane && inventoryController != null)
             // M-4: pass cached shop name to avoid extra getAllShops() HTTP call per refresh
             inventoryController.refresh(currentShopId, currentShopName);
