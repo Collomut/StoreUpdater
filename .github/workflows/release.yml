@@ -28,7 +28,7 @@ jobs:
   # ── Build Windows installer ─────────────────────────────────────────────────
   build-windows:
     name: Windows — Build installer
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
