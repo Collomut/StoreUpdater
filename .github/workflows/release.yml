@@ -1,15 +1,5 @@
 name: Build & Release
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Triggered manually from the GitHub Actions tab.
-# Enter the version number and release notes, click Run.
-# GitHub then automatically:
-#   1. Builds the Windows installer on a Windows runner
-#   2. Builds the Linux AppImage on a Linux runner
-#   3. Creates a GitHub Release with both files + the JAR
-#   4. Updates version.json so all shop PCs auto-update on next launch
-# ─────────────────────────────────────────────────────────────────────────────
-
 on:
   workflow_dispatch:
     inputs:
@@ -24,11 +14,12 @@ on:
         type: string
 
 jobs:
-
-  # ── Build Windows installer ─────────────────────────────────────────────────
-  build-windows:
-    name: Windows — Build installer
+  release:
+    name: Build & Publish Release
     runs-on: windows-2022
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -81,75 +72,40 @@ jobs:
           if (-not $iscc) { Write-Error "ISCC.exe not found"; exit 1 }
           & $iscc /Q "/DAppVersion=${{ inputs.version }}" installer.iss
 
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jar
-          path: target/StockManager-1.0.0.jar
-          retention-days: 1
-
-      - name: Upload Windows installer artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-installer
-          path: dist-installer/StockManager-Setup-${{ inputs.version }}.exe
-          retention-days: 1
-
-  # ── Create GitHub Release ───────────────────────────────────────────────────
-  publish-release:
-    name: Publish GitHub Release
-    needs: [build-windows]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Download all build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: List artifacts
-        run: find artifacts -type f | sort
-
-      - name: Update version.json
+      - name: Update version.json & Sign
+        shell: pwsh
         env:
           VERSION: ${{ inputs.version }}
           NOTES: ${{ inputs.release_notes }}
           PRIVATE_KEY: ${{ secrets.AUTO_UPDATE_PRIVATE_KEY }}
         run: |
-          # 1. Output the PKCS#8 private key from secrets to a base64 string, then decode it to key.der
-          echo "$PRIVATE_KEY" | base64 -d > key.der
-
-          # 2. Convert key.der (PKCS8 DER format) to PEM private key
+          [System.IO.File]::WriteAllBytes("key.der", [System.Convert]::FromBase64String($env:PRIVATE_KEY))
           openssl pkey -inform DER -in key.der -out key.pem
+          openssl dgst -sha256 -sign key.pem -out jar.sig "target/StockManager-1.0.0.jar"
+          $jarSigBytes = [System.IO.File]::ReadAllBytes("jar.sig")
+          $jarSig = [System.Convert]::ToBase64String($jarSigBytes)
+          Remove-Item -Force key.der, key.pem, jar.sig -ErrorAction SilentlyContinue
 
-          # 3. Sign the JAR file
-          openssl dgst -sha256 -sign key.pem -out jar.sig "artifacts/jar/StockManager-1.0.0.jar"
-          JAR_SIG=$(base64 -w 0 jar.sig)
-
-          # 4. Clean up temporary keys/signatures
-          rm -f key.der key.pem jar.sig
-
-          # 5. Extract previous api_url if it exists
-          PREV_API_URL=$(grep -oP '"api_url"\s*:\s*"\K[^"]+' version.json || echo "https://stockmanager-api.onrender.com")
-
-          # 6. Generate the signed version.json
-          cat > version.json << EOF
-          {
-            "version": "${VERSION}",
-            "api_url": "${PREV_API_URL}",
-            "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v${VERSION}/StockManager-1.0.0.jar",
-            "release_notes": "${NOTES}",
-            "signature": "${JAR_SIG}"
+          $prevApi = "https://stockmanager-api-4hw3.onrender.com"
+          if (Test-Path version.json) {
+            $json = Get-Content version.json -Raw | ConvertFrom-Json
+            if ($json.api_url) { $prevApi = $json.api_url }
           }
-          EOF
-          cat version.json
+
+          $vObj = [ordered]@{
+            version         = $env:VERSION
+            api_url         = $prevApi
+            download_url    = "https://github.com/Collomut/StoreUpdater/releases/download/v$($env:VERSION)/StockManager-1.0.0.jar"
+            release_notes   = $env:NOTES
+            signature       = $jarSig
+          }
+
+          $vJson = ConvertTo-Json $vObj -Depth 5
+          [System.IO.File]::WriteAllText("version.json", $vJson)
+          Get-Content version.json
 
       - name: Commit updated version.json
+        shell: pwsh
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -158,36 +114,34 @@ jobs:
           git push
 
       - name: Write release notes file
+        shell: pwsh
         env:
           VERSION: ${{ inputs.version }}
           NOTES: ${{ inputs.release_notes }}
         run: |
-          {
-            echo "## Stock Manager v${VERSION}"
-            echo ""
-            echo "${NOTES}"
-            echo ""
-            echo "---"
-            echo "### Downloads"
-            echo ""
-            echo "| Platform | File | Notes |"
-            echo "|---|---|---|"
-            echo "| 🪟 Windows | \`StockManager-Setup-${VERSION}.exe\` | Wizard installer, no Java needed |"
-            echo "| ☕ Any (JAR) | \`StockManager-1.0.0.jar\` | Requires Java 21 installed |"
-            echo ""
-            echo "### Auto-Update"
-            echo "Shop PCs running v1.0.1 or later will be prompted automatically on next launch."
-          } > release_notes.md
-          cat release_notes.md
+          $notesContent = @"
+          ## Stock Manager v$env:VERSION
+
+          $env:NOTES
+
+          ---
+          ### Downloads
+
+          | Platform | File | Notes |
+          |---|---|---|
+          | 🪟 Windows | `StockManager-Setup-$env:VERSION.exe` | Wizard installer, no Java needed |
+          | ☕ Any (JAR) | `StockManager-1.0.0.jar` | Requires Java 21 installed |
+
+          ### Auto-Update
+          Shop PCs running v1.0.1 or later will be prompted automatically on next launch.
+          "@
+          [System.IO.File]::WriteAllText("release_notes.md", $notesContent)
 
       - name: Create GitHub Release
+        shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
         run: |
-          gh release create "v${VERSION}" \
-            "artifacts/jar/StockManager-1.0.0.jar" \
-            "artifacts/windows-installer/StockManager-Setup-${VERSION}.exe" \
-            --title "Stock Manager v${VERSION}" \
-            --notes-file release_notes.md
-
+          $exePath = "dist-installer\StockManager-Setup-$env:VERSION.exe"
+          gh release create "v$env:VERSION" target\StockManager-1.0.0.jar $exePath --title "Stock Manager v$env:VERSION" --notes-file release_notes.md
