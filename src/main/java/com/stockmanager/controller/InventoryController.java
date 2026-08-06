@@ -134,7 +134,7 @@ public class InventoryController {
         };
         task.setOnSucceeded(e -> {
             allProducts = task.getValue();
-            productTable.setItems(FXCollections.observableArrayList(allProducts));
+            applySearch(searchField != null ? searchField.getText() : null);
             updateStats();
         });
         task.setOnFailed(e -> System.err.println("Inventory load failed: " + task.getException()));
