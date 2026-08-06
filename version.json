@@ -1,9 +1,9 @@
 {
-  "version": "1.3.9",
+  "version": "1.4.0",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.9/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.3.9/StockManager-1.3.9-x86_64.AppImage",
-  "release_notes": "Feature: Add Assign Shop button in Settings admin panel to manage worker shop assignments",
-  "signature": "PdWG2PXHmALGs0MqCNbKaAY3DvUWUidY4nZOzZkwmqlmzFZ7t8e75f8qE9s1Y+FMppyuOTlFN5vLJh6aXsSzxA1YjOah0lZQ91v2qIPbLc7rhgGc5umLftzXWzc5nIEJuEvWnfLS659kNCpnZYMRtkpNmgZf5ewPtqkPlZOg+0D304VKkd+7Ca1Twmr5Mztt+pXN/gQeSnuXdnKqz5unMf8vhiWHnYBonlljwZsvJ3aL+gQgwAsX6pxWzzZNvZuttyRsV6CLQT3qXT6x03ML8Q8qC1iF/zjUGgHIuu38o8IHM5DTIrvfDOY3ScnOn38Y2EQLUDbQv1rSX67V8eXcmQ==",
-  "signature_linux": "NXwM3a2RQnvs9wocp3psCRwZ++Rc2RQCp2s0bS9I+e7kgeucO5gSAxx5Sl03fjZa0qsLrOOlBQYYJeD4NIPqhyor32WpqrK2Oen3V5lOwbRbg2BK0guPrWG/t4zuVk3yNmwIgtJovsFKdj1aClnGXkxNXAI7niQafKn0u2Jo09HUOHgBr3+0KmlBpMG+Zmah+p7AJaT22IirnMMzRzqOkeXgSBoykQeZfmdIUfTvlPQR1uY7PwpJM3PpAGh1YQAmye/NtkkAb0ps4kfdVN1q/XJawOjrZkdDjqY2q1d89XzmT/ifchpmtIrLmPC6cqOVsqbXd//e2vhAR1Xbt1l8NA=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.4.0/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.4.0/StockManager-1.4.0-x86_64.AppImage",
+  "release_notes": "Feature: Expense Tracker module & Daily Net Income accounting",
+  "signature": "KtrCDUHhzgRfJbuqlMBFdnePdQ2XuUsb77I+UiRhZ46/7HVCR/VITCOoPkGvr3Ask5+HlmB8RcBAn32tUog6Z3jBzBdTiMFPCwEdv6gTMXMyBMbomJitUa88MG6QRZb8g1431FzAIlrFBR2IkVcr7LnQFBM5jEqIbcVBl3DtxVKfPoypBU1TOgGxUERFVgmigEtvgdU3XubDYOQQEVfr/c8SbUaV3LmMyRQoBJd04IG4XBZnj2lrfsV1Uv+AF7jtGxeLpwHsMcv3lsFHoO5ix+TG2JooYf7xUm6oKJ+LQAr3LRp9UIhFCO0TNV44/XEdDGhmSxZB2s9fgKOmtpKcSg==",
+  "signature_linux": "GFS2hCnpUs8dJg6fjrkCupNg9uWqlThIhF1VSXup5ZSCgQUc6U0H3guzBUrYq2DTCSbgJc2weQYpouhgSYfxiIReY2NZs4ch6SzGK7IbnEJDifFWJ2jTeLkdFWThhlEhR9GQAI3DYG1fCdZPQU4m9W/KYOCDMHeAEUZ4SfxGjSrG1DbEn1rwunn+IZ7ttxu59LCLJox8z7WtiQcqldqAoojbY7Mm8d3uFYUCBOj1jwbOrjYHnPc1889PDGxTTMdsqXkiMrfYnD4TpS/LGrkFCyVOB80WrsTLMGT2pXxq5GQ/BsC9hE+tAFg4kUuy4XB+3TFM7GIPBJOFhdAQAawEew=="
 }
