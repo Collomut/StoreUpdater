@@ -142,6 +142,7 @@ public class DatabaseManager {
     public boolean changePassword(int userId, String newPassword) { return userRepository.changePassword(userId, newPassword); }
     public boolean resetPassword(int userId, String newPassword) { return userRepository.resetPassword(userId, newPassword); }
     public boolean deleteUser(int userId) { return userRepository.deleteUser(userId); }
+    public boolean updateUserShop(int userId, String role, Integer shopId) { return userRepository.updateUserShop(userId, role, shopId); }
 
     public List<Shop> getAllShops() { return shopRepository.getAllShops(); }
     public boolean addShop(String name, String description) { return shopRepository.addShop(name, description); }

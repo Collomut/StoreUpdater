@@ -160,4 +160,25 @@ public class UserRepository {
             throw new RuntimeException("API error deleting user.", e);
         }
     }
+
+    public boolean updateUserShop(int userId, String role, Integer shopId) {
+        try {
+            JsonObject body = new JsonObject();
+            if (role != null) body.addProperty("role", role);
+            if (shopId != null) body.addProperty("shopId", shopId);
+
+            HttpResponse<String> response = HttpDatabaseClient.put("/api/users/" + userId, body);
+            if (response.statusCode() == 200) {
+                return true;
+            } else {
+                String errorMsg = HttpDatabaseClient.getErrorMessage(response.body(), "Failed to update user shop.");
+                throw new RuntimeException(errorMsg);
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("API error updating user shop.", e);
+        }
+    }
 }

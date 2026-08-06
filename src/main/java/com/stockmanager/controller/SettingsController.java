@@ -73,12 +73,42 @@ public class SettingsController {
                 .filter(s -> s.getId() == sid).map(Shop::getName).findFirst().orElse("?"));
         });
         colActions.setCellFactory(col -> new TableCell<>() {
-            private final Button btnDelete = new Button("Delete");
-            private final Button btnReset  = new Button("Reset Pwd");
-            private final HBox box = new HBox(8, btnReset, btnDelete);
+            private final Button btnDelete   = new Button("Delete");
+            private final Button btnReset    = new Button("Reset Pwd");
+            private final Button btnEditShop = new Button("Assign Shop");
+            private final HBox box = new HBox(8, btnEditShop, btnReset, btnDelete);
             {
                 btnDelete.setStyle("-fx-background-color:#FFF0F0;-fx-text-fill:#CC0000;-fx-background-radius:4;-fx-border-color:#CC0000;-fx-border-radius:4;-fx-border-width:1;-fx-cursor:hand;");
                 btnReset.setStyle("-fx-background-color:#F8F8F8;-fx-text-fill:#000000;-fx-background-radius:4;-fx-border-color:#999;-fx-border-radius:4;-fx-border-width:1;-fx-cursor:hand;");
+                btnEditShop.setStyle("-fx-background-color:#F0F7FF;-fx-text-fill:#0055CC;-fx-background-radius:4;-fx-border-color:#0055CC;-fx-border-radius:4;-fx-border-width:1;-fx-cursor:hand;");
+
+                btnEditShop.setOnAction(e -> {
+                    User u = getTableView().getItems().get(getIndex());
+                    if ("ADMIN".equals(u.getRole())) {
+                        showStatus("Admins have access to all shops."); return;
+                    }
+                    List<Shop> shops = db.getAllShops();
+                    if (shops.isEmpty()) { showStatus("No shops available."); return; }
+                    Shop defaultSel = shops.stream()
+                        .filter(s -> u.getShopId() != null && s.getId() == u.getShopId())
+                        .findFirst().orElse(shops.get(0));
+
+                    ChoiceDialog<Shop> dlg = new ChoiceDialog<>(defaultSel, shops);
+                    dlg.setTitle("Assign Shop");
+                    dlg.setHeaderText("Select assigned shop for worker: " + u.getUsername());
+                    dlg.setContentText("Shop:");
+                    dlg.showAndWait().ifPresent(selectedShop -> {
+                        try {
+                            if (db.updateUserShop(u.getId(), u.getRole(), selectedShop.getId())) {
+                                showStatus("Assigned " + u.getUsername() + " to " + selectedShop.getName());
+                                refresh();
+                            }
+                        } catch (Exception ex) {
+                            showStatus(ex.getMessage());
+                        }
+                    });
+                });
+
                 btnDelete.setOnAction(e -> {
                     User u = getTableView().getItems().get(getIndex());
                     if (u.getUsername().equals(Session.getUser().getUsername())) {
@@ -271,7 +301,8 @@ public class SettingsController {
 
         try {
             if (db.addUser(username, password, role, shopId)) {
-                showStatus("User added: " + username);
+                String assignedName = "ADMIN".equals(role) ? "All shops" : (shop != null ? shop.getName() : "None");
+                showStatus("User created: " + username + " (" + role + " — " + assignedName + ")");
                 fldNewUsername.clear(); fldNewUserPwd.clear();
                 refreshUsersTable(db.getAllShops());
             } else {

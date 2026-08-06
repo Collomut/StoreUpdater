@@ -169,4 +169,39 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// PUT /api/users/:id — update user role or assigned shop (Admins only)
+router.put('/:id', async (req, res) => {
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Access denied: Administrators only' });
+  }
+
+  const userId = parseInt(req.params.id);
+  const { role, shopId } = req.body;
+  const pool     = req.app.get('dbPool');
+  const auditLog = req.app.get('auditLog');
+
+  if (role && !['ADMIN', 'WORKER'].includes(role)) {
+    return res.status(400).json({ error: 'Role must be ADMIN or WORKER' });
+  }
+
+  try {
+    const target = await pool.query('SELECT username, role, shop_id FROM users WHERE id = $1', [userId]);
+    if (target.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const assignedShop = role === 'ADMIN' ? null : (shopId || null);
+    await pool.query(
+      'UPDATE users SET role = COALESCE($1, role), shop_id = $2 WHERE id = $3',
+      [role || null, assignedShop, userId]
+    );
+
+    await auditLog(pool, req.user.userId, 'USER_UPDATED', `Admin "${req.user.username}" updated user "${target.rows[0].username}" (role: ${role || target.rows[0].role}, shop: ${assignedShop})`);
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Update user error:', err.message);
+    return res.status(500).json({ error: 'Database error updating user' });
+  }
+});
+
 module.exports = router;
