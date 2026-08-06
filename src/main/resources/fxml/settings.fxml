@@ -74,7 +74,7 @@
                 </VBox>
                 <VBox spacing="4">
                     <Label styleClass="form-label" text="Password"/>
-                    <PasswordField fx:id="fldNewUserPwd" styleClass="form-field" prefWidth="140" promptText="Password"/>
+                    <PasswordField fx:id="fldNewUserPwd" styleClass="form-field" prefWidth="140" promptText="Min 8 chars"/>
                 </VBox>
                 <VBox spacing="4">
                     <Label styleClass="form-label" text="Role"/>

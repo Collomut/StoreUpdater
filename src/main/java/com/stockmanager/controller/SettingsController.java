@@ -84,18 +84,27 @@ public class SettingsController {
                     if (u.getUsername().equals(Session.getUser().getUsername())) {
                         showStatus("You cannot delete your own account."); return;
                     }
-                    if (db.deleteUser(u.getId())) { refresh(); showStatus("User deleted."); }
+                    try {
+                        if (db.deleteUser(u.getId())) { refresh(); showStatus("User deleted."); }
+                    } catch (Exception ex) {
+                        showStatus(ex.getMessage());
+                    }
                 });
                 btnReset.setOnAction(e -> {
                     User u = getTableView().getItems().get(getIndex());
                     TextInputDialog dlg = new TextInputDialog();
                     dlg.setTitle("Reset Password");
                     dlg.setHeaderText("Set new password for: " + u.getUsername());
-                    dlg.setContentText("New password:");
+                    dlg.setContentText("New password (min 8 chars):");
                     dlg.showAndWait().ifPresent(pwd -> {
-                        if (!pwd.isBlank()) {
+                        if (pwd.length() < 8) {
+                            showStatus("Password must be at least 8 characters."); return;
+                        }
+                        try {
                             db.resetPassword(u.getId(), pwd);
                             showStatus("Password reset for " + u.getUsername() + " (forced change active)");
+                        } catch (Exception ex) {
+                            showStatus(ex.getMessage());
                         }
                     });
                 });
@@ -197,18 +206,22 @@ public class SettingsController {
         if (!newPwd.equals(confirm)) {
             showStatus("New passwords do not match."); return;
         }
-        if (newPwd.length() < 6) {
-            showStatus("Password must be at least 6 characters."); return;
+        if (newPwd.length() < 8) {
+            showStatus("Password must be at least 8 characters."); return;
         }
         // Verify current password
         User u = db.authenticate(Session.getUser().getUsername(), current);
         if (u == null) { showStatus("Current password is incorrect."); return; }
 
-        if (db.changePassword(Session.getUser().getId(), newPwd)) {
-            showStatus("Password changed successfully.");
-            fldCurrentPwd.clear(); fldNewPwd.clear(); fldConfirmPwd.clear();
-        } else {
-            showStatus("Failed to change password.");
+        try {
+            if (db.changePassword(Session.getUser().getId(), newPwd)) {
+                showStatus("Password changed successfully.");
+                fldCurrentPwd.clear(); fldNewPwd.clear(); fldConfirmPwd.clear();
+            } else {
+                showStatus("Failed to change password.");
+            }
+        } catch (Exception ex) {
+            showStatus(ex.getMessage());
         }
     }
 
@@ -248,20 +261,24 @@ public class SettingsController {
         if (username.isBlank() || password.isBlank()) {
             showStatus("Username and password are required."); return;
         }
-        if (password.length() < 6) {
-            showStatus("Password must be at least 6 characters."); return;
+        if (password.length() < 8) {
+            showStatus("Password must be at least 8 characters."); return;
         }
         Integer shopId = "ADMIN".equals(role) ? null : (shop != null ? shop.getId() : null);
         if ("WORKER".equals(role) && shopId == null) {
             showStatus("Please assign a shop to the worker."); return;
         }
 
-        if (db.addUser(username, password, role, shopId)) {
-            showStatus("User added: " + username);
-            fldNewUsername.clear(); fldNewUserPwd.clear();
-            usersTable.getItems().setAll(db.getAllUsers());
-        } else {
-            showStatus("Failed to add user. Username may already exist.");
+        try {
+            if (db.addUser(username, password, role, shopId)) {
+                showStatus("User added: " + username);
+                fldNewUsername.clear(); fldNewUserPwd.clear();
+                refreshUsersTable(db.getAllShops());
+            } else {
+                showStatus("Failed to add user.");
+            }
+        } catch (Exception ex) {
+            showStatus(ex.getMessage());
         }
     }
 

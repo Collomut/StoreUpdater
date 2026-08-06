@@ -88,10 +88,17 @@ public class UserRepository {
             }
 
             HttpResponse<String> response = HttpDatabaseClient.post("/api/users", body);
-            return response.statusCode() == 200;
+            if (response.statusCode() == 200) {
+                return true;
+            } else {
+                String errorMsg = HttpDatabaseClient.getErrorMessage(response.body(), "Failed to add user.");
+                throw new RuntimeException(errorMsg);
+            }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new RuntimeException("API error creating user.", e);
         }
     }
 
@@ -102,10 +109,17 @@ public class UserRepository {
             body.addProperty("newPassword", newPassword);
 
             HttpResponse<String> response = HttpDatabaseClient.post("/api/users/change-password", body);
-            return response.statusCode() == 200;
+            if (response.statusCode() == 200) {
+                return true;
+            } else {
+                String errorMsg = HttpDatabaseClient.getErrorMessage(response.body(), "Failed to change password.");
+                throw new RuntimeException(errorMsg);
+            }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new RuntimeException("API error changing password.", e);
         }
     }
 
@@ -116,20 +130,34 @@ public class UserRepository {
             body.addProperty("newPassword", newPassword);
 
             HttpResponse<String> response = HttpDatabaseClient.post("/api/users/reset-password", body);
-            return response.statusCode() == 200;
+            if (response.statusCode() == 200) {
+                return true;
+            } else {
+                String errorMsg = HttpDatabaseClient.getErrorMessage(response.body(), "Failed to reset password.");
+                throw new RuntimeException(errorMsg);
+            }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new RuntimeException("API error resetting password.", e);
         }
     }
 
     public boolean deleteUser(int userId) {
         try {
             HttpResponse<String> response = HttpDatabaseClient.delete("/api/users/" + userId);
-            return response.statusCode() == 200;
+            if (response.statusCode() == 200) {
+                return true;
+            } else {
+                String errorMsg = HttpDatabaseClient.getErrorMessage(response.body(), "Failed to delete user.");
+                throw new RuntimeException(errorMsg);
+            }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new RuntimeException("API error deleting user.", e);
         }
     }
 }
