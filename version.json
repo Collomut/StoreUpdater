@@ -1,9 +1,9 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.4.0/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.4.0/StockManager-1.4.0-x86_64.AppImage",
-  "release_notes": "Feature: Expense Tracker module & Daily Net Income accounting",
-  "signature": "KtrCDUHhzgRfJbuqlMBFdnePdQ2XuUsb77I+UiRhZ46/7HVCR/VITCOoPkGvr3Ask5+HlmB8RcBAn32tUog6Z3jBzBdTiMFPCwEdv6gTMXMyBMbomJitUa88MG6QRZb8g1431FzAIlrFBR2IkVcr7LnQFBM5jEqIbcVBl3DtxVKfPoypBU1TOgGxUERFVgmigEtvgdU3XubDYOQQEVfr/c8SbUaV3LmMyRQoBJd04IG4XBZnj2lrfsV1Uv+AF7jtGxeLpwHsMcv3lsFHoO5ix+TG2JooYf7xUm6oKJ+LQAr3LRp9UIhFCO0TNV44/XEdDGhmSxZB2s9fgKOmtpKcSg==",
-  "signature_linux": "GFS2hCnpUs8dJg6fjrkCupNg9uWqlThIhF1VSXup5ZSCgQUc6U0H3guzBUrYq2DTCSbgJc2weQYpouhgSYfxiIReY2NZs4ch6SzGK7IbnEJDifFWJ2jTeLkdFWThhlEhR9GQAI3DYG1fCdZPQU4m9W/KYOCDMHeAEUZ4SfxGjSrG1DbEn1rwunn+IZ7ttxu59LCLJox8z7WtiQcqldqAoojbY7Mm8d3uFYUCBOj1jwbOrjYHnPc1889PDGxTTMdsqXkiMrfYnD4TpS/LGrkFCyVOB80WrsTLMGT2pXxq5GQ/BsC9hE+tAFg4kUuy4XB+3TFM7GIPBJOFhdAQAawEew=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.5.0/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.5.0/StockManager-1.5.0-x86_64.AppImage",
+  "release_notes": "Admin: Delete Sale with inventory restore; Add 24Gauge & Needle categories",
+  "signature": "TdPK97exaX/ciPfAFyBcMg6HenMqUpMsMFopjLBrJYb1MN8MwXsPRpwb36/o/gzBGbtZUsDjzvMjBQ60QZvr7T4qgslo5tlct5yvHUgnrBhKntT2IXWai084FJr9mAKTjqV3zHZkMjZuwEl0/NR33jBHCdREeSBqHZNjBeffb4LZWL+o43A6F42gFuDcepw16/rAGQNb2KkQwWOwzJ1wxDH4dPRMMtl2MbCxcAolE9ttkR0du6jFPQFPT0a1dFzyKEAAAtNNrwrSOa3Eqi5cB8sQwtGCmUkvGxw/dt+cvg/hfF5dq1HSChrS7ATLOir4Znst/E1ZKYXvMtfolG+pcA==",
+  "signature_linux": "olIL8f1f76HMMmUh1CfAifgf63fv3xDTXAd+rWqwrpQiy1dHMTdGv0R8N7rRudK894vLFVDixUm7apBslCPdz4CHXDBNwSYvYV/CCkGn5jpfLIxRgdMiE3EZD27JwMCrRgMQLluv7zITy0GNsm2exT1dKQKWMTRfLFbzPpHA9D4a7yHq6Pyx69OhAN9Kfa4IZgLzf5SZ9RD88GZJ7+SRddbNZcbpogO3VUwAiXdJNxnZSiFnS7vi2MqncySjHWXJmPhJ4JAGh1ujw3G1P5Wd86kTHzNEyDtl4F/hlYtVeXDjXrx4t1SeBGPT6jMaD3hjf2uApNp+RJPBT3wK1EMymg=="
 }
