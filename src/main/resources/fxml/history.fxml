@@ -36,14 +36,15 @@
     <!-- Unified flat table: one row per sale item -->
     <TableView fx:id="salesTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="colDate"     text="Date"         prefWidth="110"/>
-            <TableColumn fx:id="colReceipt"  text="Receipt"      prefWidth="110"/>
-            <TableColumn fx:id="colTotal"    text="Total (RWF)"  prefWidth="130"/>
-            <TableColumn fx:id="colProduct"  text="Product"      prefWidth="220"/>
-            <TableColumn fx:id="colQty"      text="Qty"          prefWidth="70"/>
-            <TableColumn fx:id="colUnitPrice" text="Unit Price"  prefWidth="120"/>
-            <TableColumn fx:id="colSubtotal" text="Subtotal"     prefWidth="120"/>
-            <TableColumn fx:id="colPayment"  text="Payment"     prefWidth="80"/>
+            <TableColumn fx:id="colDate"      text="Date"          prefWidth="100"/>
+            <TableColumn fx:id="colReceipt"   text="Receipt"       prefWidth="100"/>
+            <TableColumn fx:id="colTotal"     text="Total (RWF)"   prefWidth="120"/>
+            <TableColumn fx:id="colProduct"   text="Product"       prefWidth="210"/>
+            <TableColumn fx:id="colQty"       text="Qty"           prefWidth="60"/>
+            <TableColumn fx:id="colUnitPrice" text="Unit Price"    prefWidth="110"/>
+            <TableColumn fx:id="colSubtotal"  text="Subtotal"      prefWidth="110"/>
+            <TableColumn fx:id="colPayment"   text="Payment"       prefWidth="75"/>
+            <TableColumn fx:id="colActions"   text="Actions"       prefWidth="110"/>
         </columns>
         <placeholder><Label text="No sales found for this period." styleClass="table-placeholder"/></placeholder>
     </TableView>

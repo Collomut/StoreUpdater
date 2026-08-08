@@ -57,10 +57,11 @@ public class ProductDialog extends Dialog<Product> {
             "Rosary Beads (With Cross)", "Rosary Beads (Without Cross)",
             "Diamond Beads", "Alphabet Beads"));
         CATEGORIES.put("Strings", Arrays.asList(
-            "Strong & Stretchy", "Crystal Tec", "Fishing Line", "Fishing Twine"));
+            "Strong & Stretchy", "Crystal Tec", "Fishing Line", "Fishing Twine", "24 Gauge"));
         CATEGORIES.put("Rosary Bracelets", Collections.singletonList("Rosary Bracelet"));
         CATEGORIES.put("Hats",             Collections.singletonList("Hat"));
         CATEGORIES.put("Crosses",          Collections.singletonList("Cross"));
+        CATEGORIES.put("Needles",          Arrays.asList("Needle"));
 
         // ── Preset colors / variants per sub-type ─────────────────────────────
         // (Regular Beads and Alphabet Beads: editable, no fixed presets)
@@ -96,12 +97,14 @@ public class ProductDialog extends Dialog<Product> {
         // Fishing Twine sizes depend on colour
         PRESET_SIZES.put("Fishing Twine_White",  Arrays.asList("2mm", "3mm"));
         PRESET_SIZES.put("Fishing Twine_Brown",  Arrays.asList("24mm", "36mm"));
+        // Needle sizes
+        PRESET_SIZES.put("Needle",               Arrays.asList("58", "78"));
 
         // No colour field for these (size is the only distinguisher)
-        NO_COLOR_TYPES = Set.of("Crystal Tec", "Fishing Line");
+        NO_COLOR_TYPES = Set.of("Crystal Tec", "Fishing Line", "24 Gauge", "Needle");
 
         // These sub-types have a size field
-        HAS_SIZE_TYPES = Set.of("Regular Beads", "Crystal Tec", "Fishing Line", "Fishing Twine");
+        HAS_SIZE_TYPES = Set.of("Regular Beads", "Crystal Tec", "Fishing Line", "Fishing Twine", "Needle");
     }
 
     private final Product existingProduct;

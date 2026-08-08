@@ -164,7 +164,7 @@ router.get('/flat-rows', async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT s.sale_date::text, s.receipt_number, s.total_amount::float8, s.payment_method,
+      `SELECT s.id AS sale_id, s.sale_date::text, s.receipt_number, s.total_amount::float8, s.payment_method,
               p.name AS product_name, p.category AS product_category, p.unit AS product_unit,
               si.quantity_sold, si.unit_price::float8, sh.name AS shop_name
        FROM sale_items si
@@ -302,6 +302,62 @@ router.get('/top-products', async (req, res) => {
   } catch (err) {
     console.error('Top products error:', err.message);
     return res.status(500).json({ error: 'Database error fetching top products' });
+  }
+});
+
+// DELETE /api/sales/:id — Admin only; deletes sale and restores product stock
+router.delete('/:id', async (req, res) => {
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Access denied: Administrators only' });
+  }
+
+  const saleId = parseInt(req.params.id);
+  if (isNaN(saleId)) return res.status(400).json({ error: 'Invalid sale ID' });
+
+  const pool     = req.app.get('dbPool');
+  const auditLog = req.app.get('auditLog');
+  const client   = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // Verify the sale exists
+    const saleRes = await client.query('SELECT id, shop_id, receipt_number FROM sales WHERE id = $1', [saleId]);
+    if (saleRes.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Sale not found' });
+    }
+    const { shop_id, receipt_number } = saleRes.rows[0];
+
+    // Fetch sale items so we can restore stock
+    const itemsRes = await client.query(
+      'SELECT product_id, quantity_sold FROM sale_items WHERE sale_id = $1', [saleId]
+    );
+
+    // Restore each product's quantity
+    for (const item of itemsRes.rows) {
+      await client.query(
+        'UPDATE products SET quantity = quantity + $1 WHERE id = $2',
+        [item.quantity_sold, item.product_id]
+      );
+    }
+
+    // Delete sale items first (FK), then the sale header
+    await client.query('DELETE FROM sale_items WHERE sale_id = $1', [saleId]);
+    await client.query('DELETE FROM sales WHERE id = $1', [saleId]);
+
+    await client.query('COMMIT');
+
+    await auditLog(pool, req.user.userId, 'SALE_DELETED',
+      `Receipt ${receipt_number} deleted — stock restored — shop ${shop_id}`);
+
+    return res.json({ message: `Sale ${receipt_number} deleted and inventory restored.` });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Delete sale error:', err.message);
+    return res.status(500).json({ error: 'Failed to delete sale: ' + err.message });
+  } finally {
+    client.release();
   }
 });
 

@@ -198,7 +198,11 @@ public class SaleRepository {
                     JsonElement pmEl = obj.get("payment_method");
                     String payMethod = pmEl != null && !pmEl.isJsonNull() ? pmEl.getAsString() : "CASH";
 
+                    JsonElement sidEl = obj.get("sale_id");
+                    int sid = sidEl != null && !sidEl.isJsonNull() ? sidEl.getAsInt() : -1;
+
                     list.add(new FlatSaleRow(
+                        sid,
                         LocalDate.parse(obj.get("sale_date").getAsString()),
                         obj.get("receipt_number").getAsString(),
                         BigDecimal.valueOf(obj.get("total_amount").getAsDouble()),
@@ -264,6 +268,16 @@ public class SaleRepository {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public boolean deleteSale(int saleId) {
+        try {
+            HttpResponse<String> response = HttpDatabaseClient.delete("/api/sales/" + saleId);
+            return response.statusCode() == 200;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public BigDecimal getTodaySales(int shopId) {

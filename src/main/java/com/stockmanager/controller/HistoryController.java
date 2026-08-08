@@ -2,7 +2,7 @@ package com.stockmanager.controller;
 
 import com.stockmanager.db.DatabaseManager;
 import com.stockmanager.db.DatabaseManager.FlatSaleRow;
-import javafx.beans.property.SimpleDoubleProperty;
+import com.stockmanager.util.Session;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -18,6 +18,7 @@ public class HistoryController {
     @FXML private TableView<FlatSaleRow> salesTable;
     @FXML private TableColumn<FlatSaleRow, String>  colDate, colReceipt, colTotal, colProduct, colUnitPrice, colSubtotal, colPayment;
     @FXML private TableColumn<FlatSaleRow, Integer> colQty;
+    @FXML private TableColumn<FlatSaleRow, String>  colActions;
     @FXML private DatePicker fromDate, toDate;
     @FXML private Label lblGrandTotal;
 
@@ -40,6 +41,57 @@ public class HistoryController {
             String.format("RWF %,.0f", d.getValue().getSubtotal())));
         colPayment.setCellValueFactory(d -> new SimpleStringProperty(
             "PHONE".equals(d.getValue().paymentMethod) ? "Phone" : "Cash"));
+
+        // Delete column — admin only
+        if (colActions != null) {
+            boolean isAdmin = Session.isAdmin();
+            colActions.setVisible(isAdmin);
+
+            colActions.setCellFactory(col -> new TableCell<>() {
+                private final Button btnDelete = new Button("Delete Sale");
+                {
+                    btnDelete.setStyle(
+                        "-fx-background-color:#FFF0F0;-fx-text-fill:#CC0000;" +
+                        "-fx-background-radius:4;-fx-border-color:#CC0000;" +
+                        "-fx-border-radius:4;-fx-border-width:1;-fx-cursor:hand;-fx-font-size:11px;");
+                    btnDelete.setOnAction(e -> {
+                        FlatSaleRow row = getTableView().getItems().get(getIndex());
+                        if (row.saleId <= 0) {
+                            new Alert(Alert.AlertType.WARNING,
+                                "Cannot delete: sale ID not available. Please refresh the page.",
+                                ButtonType.OK).showAndWait();
+                            return;
+                        }
+                        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                            "Delete sale " + row.receipt + "?\n\n" +
+                            "This will REMOVE the entire sale and RESTORE the product quantities to inventory.\n" +
+                            "This action cannot be undone.",
+                            ButtonType.YES, ButtonType.NO);
+                        confirm.setTitle("Confirm Sale Deletion");
+                        confirm.setHeaderText("Delete Sale & Restore Inventory?");
+                        confirm.showAndWait().ifPresent(bt -> {
+                            if (bt == ButtonType.YES) {
+                                boolean ok = DatabaseManager.getInstance().deleteSale(row.saleId);
+                                if (ok) {
+                                    new Alert(Alert.AlertType.INFORMATION,
+                                        "Sale " + row.receipt + " deleted. Inventory has been restored.",
+                                        ButtonType.OK).showAndWait();
+                                    loadSales();
+                                } else {
+                                    new Alert(Alert.AlertType.ERROR,
+                                        "Failed to delete sale. Please check your connection and try again.",
+                                        ButtonType.OK).showAndWait();
+                                }
+                            }
+                        });
+                    });
+                }
+                @Override protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setGraphic(empty ? null : btnDelete);
+                }
+            });
+        }
 
         fromDate.setValue(LocalDate.now().withDayOfMonth(1));
         toDate.setValue(LocalDate.now());

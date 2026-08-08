@@ -171,6 +171,7 @@ public class DatabaseManager {
     public List<Product> getProductsByShop(int shopId) { return productRepository.getProducts(shopId); }
 
     public int recordSale(Sale sale) { return saleRepository.recordSale(sale); }
+    public boolean deleteSale(int saleId) { return saleRepository.deleteSale(saleId); }
     public List<Sale> getSales(int shopId, LocalDate from, LocalDate to) { return saleRepository.getSales(shopId, from, to); }
     public List<SaleItem> getSaleItems(int saleId) { return saleRepository.getSaleItems(saleId); }
     public BigDecimal getTotalSales(int shopId, LocalDate from, LocalDate to) { return saleRepository.getTotalSales(shopId, from, to); }
@@ -190,6 +191,7 @@ public class DatabaseManager {
     // ─── DTO Inner Classes ──────────────────────────────────────────────────
 
     public static class FlatSaleRow {
+        public final int saleId;
         public final LocalDate date;
         public final String receipt;
         public final BigDecimal saleTotal;
@@ -197,11 +199,15 @@ public class DatabaseManager {
         public final int qty;
         public final BigDecimal unitPrice;
         public final String paymentMethod;
+        /** Legacy constructor — saleId defaults to -1 */
         public FlatSaleRow(LocalDate d, String r, BigDecimal t, String p, int q, BigDecimal u) {
-            date=d; receipt=r; saleTotal=t; product=p; qty=q; unitPrice=u; paymentMethod="CASH";
+            saleId=-1; date=d; receipt=r; saleTotal=t; product=p; qty=q; unitPrice=u; paymentMethod="CASH";
         }
         public FlatSaleRow(LocalDate d, String r, BigDecimal t, String p, int q, BigDecimal u, String pm) {
-            date=d; receipt=r; saleTotal=t; product=p; qty=q; unitPrice=u; paymentMethod=pm != null ? pm : "CASH";
+            saleId=-1; date=d; receipt=r; saleTotal=t; product=p; qty=q; unitPrice=u; paymentMethod=pm != null ? pm : "CASH";
+        }
+        public FlatSaleRow(int sid, LocalDate d, String r, BigDecimal t, String p, int q, BigDecimal u, String pm) {
+            saleId=sid; date=d; receipt=r; saleTotal=t; product=p; qty=q; unitPrice=u; paymentMethod=pm != null ? pm : "CASH";
         }
         public BigDecimal getSubtotal() { return BigDecimal.valueOf(qty).multiply(unitPrice); }
     }
