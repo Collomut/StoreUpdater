@@ -1,9 +1,9 @@
 {
-  "version": "1.5.0",
+  "version": "1.5.1",
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
-  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.5.0/StockManager-1.0.0.jar",
-  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.5.0/StockManager-1.5.0-x86_64.AppImage",
-  "release_notes": "Feature update: Delete Sale with inventory restore, 24Gauge, Needle, and Measured Beads categories",
-  "signature": "jONThzXtcwpRLZ1JURqXZS1UjaX/BmR9i7/WmDZkgczx2hjzHS8l+Vq97CEoSO+6t/l3N74r3GhwsFBz7B7oAd9Wzq2x/xVpY48OR/Ugv5nNpnMWjSGcQncZytwHO2EVfSrgi8tN4phzWaxA0VoLGqzXo6BKPwJAr9Tb5EZAGSEk+/zKgoQCxzcnnrOgGpqU/rGrFJwbOh2G4eJuBFyqszeww9T9YE0+zjClL6orK3QsT16NJI+QZaj+j9XvQtJ5xnKJCs/HcxqJRkBQAQbS8/zZa1HHbwJ6mTi/8wstUjeCFzaLpX7jQIibw6y9GC5ceEwBAM/lKRvdbWtHFc1t8A==",
-  "signature_linux": "dU4hb1Q/133drHELhRnCpZ61FY8lojAXm3DZq9N9txsTUBIt7mujkq38gcnC3OBdu2z9EYrntYlccc3aI2wEdHaI0QT01W8tASZ/oWKi3BzGE4erNhNAWJXPRx711M56eGeTLMLLyzAFuYbjPJQ2cHxYhV/7nO/X5z6VuBlY7iq8txPZpoLAbNPlMS/RmkJzB4Xp9cPVs1WsnSyUqij/4gB9O6FqOzNrkbBuoGXhFhjUUcpfhygp/Inp3SEXcxihCiP8FkS+ws7JrmRJKZ5Ik2zGWp+z40a0niH2Pi6imuZ7oocEngF729yVwXbcbB5JellJuPvyw+kSHyuww9TxhA=="
+  "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.5.1/StockManager-1.0.0.jar",
+  "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.5.1/StockManager-1.5.1-x86_64.AppImage",
+  "release_notes": "Admin: Delete Sale with inventory restore; Categories: 24Gauge, Needle (58/78), Measured Beads (50g/100g)",
+  "signature": "dnnN7kqQA6W6o1B2Pw7ZruyNo8hrMP7U5/yet4JCsG5coT9aO50CZhOlX2sgOLNfnc9r1MEWIkcdI+NMWbNsbnZ9Rq8QjYtHcO5vdN1mKdMwU4gfNOD/2z7KC7Jlmx8pBxHbOAp6Y8RTeClrdn5tWFNHtdR5rvuKV2seBzmm8nxtvaeh8SWehT3rW/ke/rmGRBSz+FPslQKv8tmPrxdivKCMZ6WRzrFY5dt/brnawUJeeMLkhZi42iHZaWXKP6bcANUcZn7o3AhQFPPjlQTL4B/n1pG7R0Toe7mwvChp3MFCyPOi4QeboQz9hC1vU29Bs47E8e2Y/qlQJHpNuNqqCw==",
+  "signature_linux": "tdcslRt4iqOJr0G6nfMNJlnI5ysZ1ooom+UGl2vTn4Mg1U/YLG9eltrBzfWGCtu/UFrN3zUwfl7ys27yTscptHSGw6B1B1UhADudnxfhbRO/6/hf5ykLNr8vAMkEDIOPYGXcGA/xkK8xLYQpss9mMZwPpqsyH4H1hjsE6RxXjt9qGDdD8mnvCNnsS04N1c0uXxNpavU3rd1SmznnL4YLnXZZU1TS7OzVTG9t9evH3R2Y2kmIkxDGlBPsQHta8iXvWn7qET/eHgrPVON1IlPES+wKVu87Y3shCg7kHrO7g3qWhSOhuRwYRHHitNhziph6/LUUGUiPMw5MwbUM3L/c6w=="
 }
