@@ -53,7 +53,7 @@ public class ProductDialog extends Dialog<Product> {
     static {
         // ── Main categories and their sub-types ───────────────────────────────
         CATEGORIES.put("Beads", Arrays.asList(
-            "Regular Beads", "Bag Beads", "Wood Beads",
+            "Regular Beads", "Measured Beads", "Bag Beads", "Wood Beads",
             "Rosary Beads (With Cross)", "Rosary Beads (Without Cross)",
             "Diamond Beads", "Alphabet Beads"));
         CATEGORIES.put("Strings", Arrays.asList(
@@ -97,6 +97,8 @@ public class ProductDialog extends Dialog<Product> {
         // Fishing Twine sizes depend on colour
         PRESET_SIZES.put("Fishing Twine_White",  Arrays.asList("2mm", "3mm"));
         PRESET_SIZES.put("Fishing Twine_Brown",  Arrays.asList("24mm", "36mm"));
+        // Measured Beads — sold by weight (grams)
+        PRESET_SIZES.put("Measured Beads",       Arrays.asList("50g", "100g"));
         // Needle sizes
         PRESET_SIZES.put("Needle",               Arrays.asList("58", "78"));
 
@@ -104,7 +106,7 @@ public class ProductDialog extends Dialog<Product> {
         NO_COLOR_TYPES = Set.of("Crystal Tec", "Fishing Line", "24 Gauge", "Needle");
 
         // These sub-types have a size field
-        HAS_SIZE_TYPES = Set.of("Regular Beads", "Crystal Tec", "Fishing Line", "Fishing Twine", "Needle");
+        HAS_SIZE_TYPES = Set.of("Regular Beads", "Measured Beads", "Crystal Tec", "Fishing Line", "Fishing Twine", "Needle");
     }
 
     private final Product existingProduct;
