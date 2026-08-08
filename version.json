@@ -3,7 +3,7 @@
   "api_url": "https://stockmanager-api-4hw3.onrender.com",
   "download_url": "https://github.com/Collomut/StoreUpdater/releases/download/v1.5.0/StockManager-1.0.0.jar",
   "download_url_linux": "https://github.com/Collomut/StoreUpdater/releases/download/v1.5.0/StockManager-1.5.0-x86_64.AppImage",
-  "release_notes": "Admin: Delete Sale with inventory restore; Add 24Gauge & Needle categories",
-  "signature": "TdPK97exaX/ciPfAFyBcMg6HenMqUpMsMFopjLBrJYb1MN8MwXsPRpwb36/o/gzBGbtZUsDjzvMjBQ60QZvr7T4qgslo5tlct5yvHUgnrBhKntT2IXWai084FJr9mAKTjqV3zHZkMjZuwEl0/NR33jBHCdREeSBqHZNjBeffb4LZWL+o43A6F42gFuDcepw16/rAGQNb2KkQwWOwzJ1wxDH4dPRMMtl2MbCxcAolE9ttkR0du6jFPQFPT0a1dFzyKEAAAtNNrwrSOa3Eqi5cB8sQwtGCmUkvGxw/dt+cvg/hfF5dq1HSChrS7ATLOir4Znst/E1ZKYXvMtfolG+pcA==",
-  "signature_linux": "olIL8f1f76HMMmUh1CfAifgf63fv3xDTXAd+rWqwrpQiy1dHMTdGv0R8N7rRudK894vLFVDixUm7apBslCPdz4CHXDBNwSYvYV/CCkGn5jpfLIxRgdMiE3EZD27JwMCrRgMQLluv7zITy0GNsm2exT1dKQKWMTRfLFbzPpHA9D4a7yHq6Pyx69OhAN9Kfa4IZgLzf5SZ9RD88GZJ7+SRddbNZcbpogO3VUwAiXdJNxnZSiFnS7vi2MqncySjHWXJmPhJ4JAGh1ujw3G1P5Wd86kTHzNEyDtl4F/hlYtVeXDjXrx4t1SeBGPT6jMaD3hjf2uApNp+RJPBT3wK1EMymg=="
+  "release_notes": "Feature update: Delete Sale with inventory restore, 24Gauge, Needle, and Measured Beads categories",
+  "signature": "jONThzXtcwpRLZ1JURqXZS1UjaX/BmR9i7/WmDZkgczx2hjzHS8l+Vq97CEoSO+6t/l3N74r3GhwsFBz7B7oAd9Wzq2x/xVpY48OR/Ugv5nNpnMWjSGcQncZytwHO2EVfSrgi8tN4phzWaxA0VoLGqzXo6BKPwJAr9Tb5EZAGSEk+/zKgoQCxzcnnrOgGpqU/rGrFJwbOh2G4eJuBFyqszeww9T9YE0+zjClL6orK3QsT16NJI+QZaj+j9XvQtJ5xnKJCs/HcxqJRkBQAQbS8/zZa1HHbwJ6mTi/8wstUjeCFzaLpX7jQIibw6y9GC5ceEwBAM/lKRvdbWtHFc1t8A==",
+  "signature_linux": "dU4hb1Q/133drHELhRnCpZ61FY8lojAXm3DZq9N9txsTUBIt7mujkq38gcnC3OBdu2z9EYrntYlccc3aI2wEdHaI0QT01W8tASZ/oWKi3BzGE4erNhNAWJXPRx711M56eGeTLMLLyzAFuYbjPJQ2cHxYhV/7nO/X5z6VuBlY7iq8txPZpoLAbNPlMS/RmkJzB4Xp9cPVs1WsnSyUqij/4gB9O6FqOzNrkbBuoGXhFhjUUcpfhygp/Inp3SEXcxihCiP8FkS+ws7JrmRJKZ5Ik2zGWp+z40a0niH2Pi6imuZ7oocEngF729yVwXbcbB5JellJuPvyw+kSHyuww9TxhA=="
 }
