@@ -4,6 +4,24 @@ const router = express.Router();
 // M-3: Settings keys that non-admin workers are allowed to read
 const WORKER_READABLE_KEYS = ['usd_rate'];
 
+// GET /api/settings — list settings
+router.get('/', async (req, res) => {
+  const pool = req.app.get('dbPool');
+  try {
+    let query = 'SELECT key, value FROM settings';
+    let params = [];
+    if (req.user.role !== 'ADMIN') {
+      query = 'SELECT key, value FROM settings WHERE key = ANY($1)';
+      params = [WORKER_READABLE_KEYS];
+    }
+    const result = await pool.query(query, params);
+    return res.json(result.rows);
+  } catch (err) {
+    console.error('Fetch settings error:', err.message);
+    return res.status(500).json({ error: 'Database error fetching settings' });
+  }
+});
+
 // GET /api/settings/:key — get setting value
 router.get('/:key', async (req, res) => {
   const { key } = req.params;
