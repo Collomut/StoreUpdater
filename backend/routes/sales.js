@@ -151,16 +151,19 @@ router.get('/items/:saleId', async (req, res) => {
 // GET /api/sales/flat-rows — flat sales history listing
 router.get('/flat-rows', async (req, res) => {
   let shopId = req.query.shopId ? parseInt(req.query.shopId) : null;
-  const { from, to } = req.query;
+  let { from, to, limit } = req.query;
   const pool = req.app.get('dbPool');
 
   if (req.user.role === 'WORKER') {
     shopId = req.user.shopId;
   }
 
-  if (!shopId || !from || !to) {
-    return res.status(400).json({ error: 'shopId, from, and to parameters are required' });
+  if (!shopId) {
+    return res.status(400).json({ error: 'shopId parameter is required' });
   }
+
+  if (!from) from = '2020-01-01';
+  if (!to)   to   = '2099-12-31';
 
   try {
     const result = await pool.query(
