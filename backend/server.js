@@ -52,12 +52,27 @@ app.use(express.json({ limit: '1mb' }));
 app.set('trust proxy', 1);
 
 // ─── H-1: Native Zero-Dependency In-Memory Rate Limiter ──────────────────────
-const rateLimitMap = new Map();
 function createRateLimiter(windowMs, maxHits) {
-  return (req, res, next) => {
-    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const store = new Map();
+
+  // Periodic cleanup every 5 minutes to prevent memory leak
+  setInterval(() => {
     const now = Date.now();
-    const record = rateLimitMap.get(ip) || { count: 0, resetTime: now + windowMs };
+    for (const [key, record] of store.entries()) {
+      if (now > record.resetTime) {
+        store.delete(key);
+      }
+    }
+  }, 5 * 60 * 1000).unref();
+
+  return (req, res, next) => {
+    let ip = req.ip;
+    if (!ip) {
+      const forwarded = req.headers['x-forwarded-for'];
+      ip = forwarded ? forwarded.split(',')[0].trim() : (req.socket ? req.socket.remoteAddress : 'unknown');
+    }
+    const now = Date.now();
+    const record = store.get(ip) || { count: 0, resetTime: now + windowMs };
 
     if (now > record.resetTime) {
       record.count = 1;
@@ -65,7 +80,7 @@ function createRateLimiter(windowMs, maxHits) {
     } else {
       record.count++;
     }
-    rateLimitMap.set(ip, record);
+    store.set(ip, record);
 
     if (record.count > maxHits) {
       return res.status(429).json({ error: 'Too many requests. Please slow down.' });
@@ -74,11 +89,14 @@ function createRateLimiter(windowMs, maxHits) {
   };
 }
 
-const globalLimiter = createRateLimiter(60 * 1000, 300);
-const loginLimiter  = createRateLimiter(15 * 60 * 1000, 20);
+// Global API rate limit: 1200 requests per 1 minute window (20 req/sec) to support multi-client shop networks
+const globalLimiter = createRateLimiter(60 * 1000, 1200);
 
-app.use('/api/', globalLimiter);
+// Login rate limit: 30 attempts per 15 minutes window on /api/auth/login
+const loginLimiter  = createRateLimiter(15 * 60 * 1000, 30);
+
 app.use('/api/auth/login', loginLimiter);
+app.use('/api/', globalLimiter);
 
 
 
