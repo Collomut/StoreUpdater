@@ -259,8 +259,10 @@ router.get('/overview-stats', async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT sh.id, sh.name,
-              COALESCE(SUM(CASE WHEN s.sale_date = CURRENT_DATE THEN s.total_amount END), 0)::float8               AS today_sales,
-              COALESCE(SUM(CASE WHEN s.sale_date >= date_trunc('month', CURRENT_DATE) THEN s.total_amount END), 0)::float8 AS month_sales,
+              COALESCE(SUM(CASE WHEN s.sale_date = CURRENT_DATE THEN s.total_amount END), 0)::float8                               AS today_sales,
+              COALESCE(SUM(CASE WHEN s.sale_date = CURRENT_DATE AND s.payment_method = 'CASH'  THEN s.total_amount END), 0)::float8 AS today_cash,
+              COALESCE(SUM(CASE WHEN s.sale_date = CURRENT_DATE AND s.payment_method = 'PHONE' THEN s.total_amount END), 0)::float8 AS today_phone,
+              COALESCE(SUM(CASE WHEN s.sale_date >= date_trunc('month', CURRENT_DATE) THEN s.total_amount END), 0)::float8         AS month_sales,
               COALESCE((SELECT SUM(p.quantity * p.selling_price) FROM products p WHERE p.shop_id = sh.id), 0)::float8 AS stock_value,
               COALESCE((SELECT COUNT(*) FROM products p WHERE p.shop_id = sh.id AND p.quantity < 5), 0)::int    AS low_stock,
               COALESCE((SELECT COUNT(*) FROM products p WHERE p.shop_id = sh.id), 0)::int                       AS total_products
